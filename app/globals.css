@@ -4,58 +4,59 @@
 
 :root {
   /* ─── Recall.ai Design Tokens ─────────────────────────────────── */
-  --bg:           #0a0a0f;
-  --bg2:          #111118;
-  --bg3:          #1a1a24;
-  --card:         #13131d;
-  --card2:        #1c1c28;
-  --border:       rgba(255,255,255,0.07);
-  --border2:      rgba(255,255,255,0.12);
-  --accent:       #7c6ef0;
-  --accent2:      #a594f9;
-  --red:          #f05c5c;
-  --green:        #4ade80;
-  --amber:        #fbbf24;
-  --text:         #e8e6f0;
-  --text2:        #8e8ca0;
-  --text3:        #5c5a70;
+  --bg:           #05050a;
+  --bg2:          #0b0a15;
+  --bg3:          #121125;
+  --card:         rgba(15, 14, 28, 0.7);
+  --card2:        rgba(26, 24, 46, 0.8);
+  --border:       rgba(255, 255, 255, 0.06);
+  --border2:      rgba(255, 255, 255, 0.12);
+  --accent:       #8b5cf6; /* Indigo / Violet */
+  --accent2:      #ec4899; /* Electric Magenta */
+  --accent3:      #06b6d4; /* Cyber Teal */
+  --red:          #ef4444;
+  --green:        #10b981;
+  --amber:        #f59e0b;
+  --text:         #f4f4f5;
+  --text2:        #a1a1aa;
+  --text3:        #52525b;
 
   /* ─── Shadcn Theme Tokens (mapped to Recall.ai palette) ──────── */
-  --background: #0a0a0f;
-  --foreground: #e8e6f0;
-  --card: #13131d;
-  --card-foreground: #e8e6f0;
-  --popover: #13131d;
-  --popover-foreground: #e8e6f0;
-  --primary: #7c6ef0;
+  --background: #05050a;
+  --foreground: #f4f4f5;
+  --card: rgba(15, 14, 28, 0.7);
+  --card-foreground: #f4f4f5;
+  --popover: #0a0914;
+  --popover-foreground: #f4f4f5;
+  --primary: #8b5cf6;
   --primary-foreground: #ffffff;
-  --secondary: #1c1c28;
-  --secondary-foreground: #e8e6f0;
-  --muted: #1a1a24;
-  --muted-foreground: #8e8ca0;
-  --accent: #7c6ef0;
+  --secondary: #121125;
+  --secondary-foreground: #f4f4f5;
+  --muted: #0d0c18;
+  --muted-foreground: #a1a1aa;
+  --accent: #8b5cf6;
   --accent-foreground: #ffffff;
-  --destructive: #f05c5c;
+  --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: rgba(255,255,255,0.07);
-  --input: #1c1c28;
-  --ring: #7c6ef0;
-  --radius: 0.625rem;
+  --border: rgba(255, 255, 255, 0.06);
+  --input: #121125;
+  --ring: #8b5cf6;
+  --radius: 0.75rem;
 
-  --sidebar: #111118;
-  --sidebar-foreground: #e8e6f0;
-  --sidebar-primary: #7c6ef0;
+  --sidebar: #07060f;
+  --sidebar-foreground: #f4f4f5;
+  --sidebar-primary: #8b5cf6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1a1a24;
-  --sidebar-accent-foreground: #e8e6f0;
-  --sidebar-border: rgba(255,255,255,0.07);
-  --sidebar-ring: #7c6ef0;
+  --sidebar-accent: #121125;
+  --sidebar-accent-foreground: #f4f4f5;
+  --sidebar-border: rgba(255, 255, 255, 0.05);
+  --sidebar-ring: #8b5cf6;
 
-  --chart-1: #7c6ef0;
-  --chart-2: #a594f9;
-  --chart-3: #f05c5c;
-  --chart-4: #4ade80;
-  --chart-5: #fbbf24;
+  --chart-1: #8b5cf6;
+  --chart-2: #ec4899;
+  --chart-3: #06b6d4;
+  --chart-4: #10b981;
+  --chart-5: #f59e0b;
 }
 
 @theme inline {
@@ -196,22 +197,78 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 9999;
   }
 
   /* ─── Custom thin scrollbars ─────────────────────────────────── */
-  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 999px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
-  * { scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.18); }
+  * { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.08) transparent; }
 
   /* Dropdown option text visibility fix */
   select option {
-    background-color: var(--card);
+    background-color: var(--bg2);
     color: var(--text);
+  }
+
+  /* ─── Custom Premium Layout Utilities ───────────────────────── */
+  .glass-panel {
+    background: rgba(15, 14, 28, 0.45);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.5);
+  }
+
+  .glass-panel-hover {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glass-panel-hover:hover {
+    background: rgba(26, 24, 46, 0.55);
+    border-color: rgba(236, 72, 153, 0.2);
+    box-shadow: 0 20px 50px -15px rgba(139, 92, 246, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 50px -10px rgba(139, 92, 246, 0.3);
+  }
+
+  .glow-pink {
+    box-shadow: 0 0 50px -10px rgba(236, 72, 153, 0.3);
+  }
+
+  .glow-teal {
+    box-shadow: 0 0 50px -10px rgba(6, 182, 212, 0.3);
+  }
+
+  .text-glow-purple {
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, #a78bfa 0%, #ec4899 50%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-purple-pink {
+    background: linear-gradient(135deg, #c084fc 0%, #db2777 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-cyan-blue {
+    background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }
 

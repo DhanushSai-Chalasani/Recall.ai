@@ -75,28 +75,32 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-[var(--bg)] flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden selection:bg-purple-500/30">
+      {/* Ambient background glows */}
+      <div className="absolute top-[30%] left-[20%] w-[350px] h-[350px] bg-purple-600/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-pink-500/10 blur-[130px] rounded-full pointer-events-none" />
+
       {/* Logo */}
-      <Link href="/" className="flex items-center gap-2.5 mb-10 group">
-        <div className="w-9 h-9 rounded-xl bg-[var(--accent)] flex items-center justify-center shadow-lg shadow-[var(--accent)]/30 group-hover:shadow-[var(--accent)]/50 transition-shadow">
-          <Mic className="w-4.5 h-4.5 text-white" />
+      <Link href="/" className="flex items-center gap-2.5 mb-8 group relative z-10">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/25 group-hover:scale-105 transition-transform">
+          <Mic className="w-5 h-5 text-white" />
         </div>
-        <span className="text-2xl font-bold text-[var(--text)]" style={{ fontFamily: "var(--font-serif)" }}>
-          Recall.ai
+        <span className="text-2xl font-bold tracking-tight text-[var(--text)] font-sans">
+          Recall<span className="text-purple-400">.ai</span>
         </span>
       </Link>
 
-      <div className="w-full max-w-md space-y-7">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-[var(--text)]" style={{ fontFamily: "var(--font-serif)" }}>
-            Welcome back
+      <div className="w-full max-w-md relative z-10 glass-panel p-8 rounded-2xl glow-purple">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-extrabold tracking-tight text-[var(--text)]">
+            Welcome Back
           </h1>
-          <p className="mt-1.5 text-sm text-[var(--text2)]">Sign in to your account to continue</p>
+          <p className="mt-2 text-sm text-[var(--text2)]">Sign in to your meeting vault</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-[var(--text2)] text-xs font-medium uppercase tracking-wide">Email</Label>
+        <form onSubmit={handleLogin} className="space-y-5">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-[var(--text2)] text-xs font-semibold uppercase tracking-wider">Email</Label>
             <Input
               id="email"
               type="email"
@@ -104,11 +108,11 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-[var(--bg2)] border-[var(--border)] text-[var(--text)] placeholder:text-[var(--text3)] focus:border-[var(--accent)]/60"
+              className="bg-black/30 border-white/5 text-[var(--text)] placeholder:text-[var(--text3)] focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/35 h-11 rounded-xl transition-all"
             />
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="password" className="text-[var(--text2)] text-xs font-medium uppercase tracking-wide">Password</Label>
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-[var(--text2)] text-xs font-semibold uppercase tracking-wider">Password</Label>
             <Input
               id="password"
               type="password"
@@ -116,7 +120,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Your password"
-              className="bg-[var(--bg2)] border-[var(--border)] text-[var(--text)] placeholder:text-[var(--text3)] focus:border-[var(--accent)]/60"
+              className="bg-black/30 border-white/5 text-[var(--text)] placeholder:text-[var(--text3)] focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/35 h-11 rounded-xl transition-all"
             />
           </div>
 
@@ -126,7 +130,7 @@ export default function LoginPage() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="rounded-lg bg-[var(--red)]/10 border border-[var(--red)]/20 px-3 py-2.5 text-sm text-[var(--red)]"
+                className="rounded-xl bg-[var(--red)]/10 border border-[var(--red)]/20 px-3 py-3 text-xs font-medium text-[var(--red)]"
               >
                 {error}
               </motion.div>
@@ -135,18 +139,18 @@ export default function LoginPage() {
 
           <Button
             type="submit"
-            className="w-full py-3 bg-[var(--accent)] hover:bg-[var(--accent)]/90 text-white font-semibold shadow-lg shadow-[var(--accent)]/20 transition-all"
+            className="w-full py-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold rounded-xl shadow-lg shadow-purple-500/20 transition-all border border-purple-500/20"
             disabled={isLoading}
           >
             {isLoading ? "Signing in…" : "Sign In"}
           </Button>
         </form>
 
-        <p className="text-center text-sm text-[var(--text3)]">
+        <p className="text-center text-sm text-[var(--text3)] mt-6">
           Don&apos;t have an account?{" "}
           <Link
             href={returnUrl ? `/auth/signup?returnUrl=${encodeURIComponent(returnUrl)}` : "/auth/signup"}
-            className="text-[var(--accent)] hover:underline font-medium"
+            className="text-purple-400 hover:text-purple-300 hover:underline font-semibold"
           >
             Sign up
           </Link>

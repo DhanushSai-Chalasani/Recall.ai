@@ -110,51 +110,48 @@ export default function MeetingDetailPage() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex-1 p-6 lg:p-8 overflow-y-auto"
+      className="flex-1 p-6 lg:p-10 overflow-y-auto bg-gradient-to-b from-[#05050c] to-[#0a0a16] selection:bg-purple-500/30"
     >
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 mb-6">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-8">
         <div>
           <Link
             href="/meetings"
-            className="inline-flex items-center gap-1 text-xs text-[var(--text3)] hover:text-[var(--accent)] transition-colors mb-3"
+            className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-purple-400 font-bold uppercase tracking-wider mb-4 transition-colors"
           >
-            <ArrowLeft className="w-3 h-3" /> Back to meetings
+            <ArrowLeft className="w-3.5 h-3.5" /> Back to meetings
           </Link>
           <div className="flex flex-wrap items-center gap-3">
-            <h1
-              className="text-2xl font-bold text-[var(--text)]"
-              style={{ fontFamily: 'var(--font-serif)' }}
-            >
+            <h1 className="text-3xl font-extrabold tracking-tight text-white">
               {meeting.name}
             </h1>
             {meeting.insights?.meetingType && (
-              <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[10px] font-bold text-white bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] border border-white/10 shadow-md shadow-[var(--accent)]/20 animate-pulse-slow">
+              <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[10px] font-bold text-white bg-gradient-to-r from-purple-600 to-pink-500 border border-white/10 shadow-sm">
                 ✨ {meeting.insights.meetingType}
               </span>
             )}
           </div>
-          <p className="text-xs text-[var(--text3)] mt-1.5">
+          <p className="text-xs text-[var(--text2)] mt-2 font-semibold">
             {date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             {' • '}
             {date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-4 md:mt-0">
           <button
             onClick={handleToggleArchive}
             disabled={isArchiving}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-xs font-semibold text-[var(--text2)] hover:text-[var(--text)] hover:bg-[var(--bg3)] transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-white/5 bg-black/45 text-xs font-bold text-[var(--text2)] hover:text-white hover:bg-white/5 transition-all disabled:opacity-50 cursor-pointer shadow-md"
             title={meeting.insights?.is_archived ? "Restore Meeting" : "Archive Meeting"}
           >
-            <Archive className={`w-3.5 h-3.5 ${meeting.insights?.is_archived ? "fill-[var(--accent)] text-[var(--accent)]" : ""}`} />
+            <Archive className={`w-3.5 h-3.5 ${meeting.insights?.is_archived ? "fill-purple-400 text-purple-400" : ""}`} />
             <span>{meeting.insights?.is_archived ? "Restore" : "Archive"}</span>
           </button>
           
           <button
             onClick={handleDelete}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-xs font-semibold text-[var(--red)] hover:bg-[var(--red)]/10 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-white/5 bg-black/45 text-xs font-bold text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition-all cursor-pointer shadow-md"
             title="Delete Meeting"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -172,52 +169,66 @@ export default function MeetingDetailPage() {
       <SpeakerChips speakers={meeting.speakers} />
 
       {/* Tabs */}
-      <Tabs defaultValue="tldr" className="w-full">
-        <TabsList className="w-full grid grid-cols-4 gap-1">
-          <TabsTrigger value="tldr" className="flex items-center gap-1.5">
+      <Tabs defaultValue="tldr" className="w-full mt-6">
+        <TabsList className="w-full grid grid-cols-4 p-1.5 bg-black/40 border border-white/5 rounded-2xl gap-1">
+          <TabsTrigger 
+            value="tldr" 
+            className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+          >
             <FileTextIcon className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">TLDR</span>
           </TabsTrigger>
-          <TabsTrigger value="transcript" className="flex items-center gap-1.5">
+          <TabsTrigger 
+            value="transcript" 
+            className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+          >
             <MessageSquare className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Transcript</span>
           </TabsTrigger>
-          <TabsTrigger value="actions" className="flex items-center gap-1.5">
+          <TabsTrigger 
+            value="actions" 
+            className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+          >
             <CheckSquare className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Actions</span>
-            <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)]">
+            <span className="ml-1 text-[9px] px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-400 border border-purple-500/25">
               {meeting.actionItems.length}
             </span>
           </TabsTrigger>
-          <TabsTrigger value="insights" className="flex items-center gap-1.5">
+          <TabsTrigger 
+            value="insights" 
+            className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+          >
             <Lightbulb className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Insights</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="tldr">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <TLDRCard result={meeting} />
-          </motion.div>
-        </TabsContent>
+        <div className="mt-6">
+          <TabsContent value="tldr">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <TLDRCard result={meeting} />
+            </motion.div>
+          </TabsContent>
 
-        <TabsContent value="transcript">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <TranscriptView lines={meeting.transcript} />
-          </motion.div>
-        </TabsContent>
+          <TabsContent value="transcript">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <TranscriptView lines={meeting.transcript} />
+            </motion.div>
+          </TabsContent>
 
-        <TabsContent value="actions">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <ActionItemList items={meeting.actionItems} />
-          </motion.div>
-        </TabsContent>
+          <TabsContent value="actions">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <ActionItemList items={meeting.actionItems} />
+            </motion.div>
+          </TabsContent>
 
-        <TabsContent value="insights">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <InsightsPanel insights={meeting.insights} speakers={meeting.speakers} />
-          </motion.div>
-        </TabsContent>
+          <TabsContent value="insights">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <InsightsPanel insights={meeting.insights} speakers={meeting.speakers} />
+            </motion.div>
+          </TabsContent>
+        </div>
       </Tabs>
     </motion.div>
   )

@@ -62,21 +62,21 @@ export function TranscriptView({ lines, onSeek }: TranscriptViewProps) {
     : lines
 
   return (
-    <div className="space-y-3">
+    <div className="glass-panel p-6 rounded-2xl shadow-xl space-y-4">
       {/* Search bar */}
-      <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--bg)] border border-[var(--border)]">
-        <Search className="w-4 h-4 text-[var(--text3)]" />
+      <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-black/40 border border-white/5 focus-within:border-purple-500/50 focus-within:ring-1 focus-within:ring-purple-500/35 transition-all">
+        <Search className="w-4 h-4 text-zinc-500" />
         <input
           type="text"
-          placeholder="Search transcript..."
+          placeholder="Search keywords inside transcript..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 bg-transparent text-sm text-[var(--text)] placeholder:text-[var(--text3)] outline-none"
+          className="flex-1 bg-transparent text-sm text-[var(--text)] placeholder:text-[var(--text3)] outline-none font-semibold"
         />
       </div>
 
       {/* Transcript lines */}
-      <div className="max-h-[320px] overflow-y-auto space-y-1 pr-1 scrollbar-thin">
+      <div className="max-h-[400px] overflow-y-auto space-y-1.5 pr-2 scrollbar-thin">
         {filtered.map((line, i) => {
           const color = getSpeakerColor(speakerIndex.get(line.speaker) ?? 0)
           return (
@@ -86,18 +86,18 @@ export function TranscriptView({ lines, onSeek }: TranscriptViewProps) {
                 onSeek?.(line.timestamp)
                 window.dispatchEvent(new CustomEvent('seek-audio', { detail: line.timestamp }))
               }}
-              className="w-full text-left flex items-start gap-3 p-2 rounded-lg hover:bg-[var(--bg3)] transition-colors group cursor-pointer"
+              className="w-full text-left flex items-start gap-4 p-3 rounded-xl hover:bg-purple-600/10 border border-transparent hover:border-purple-500/10 transition-all group cursor-pointer"
             >
               {/* Speaker name */}
-              <span className="text-xs font-semibold min-w-[80px] truncate" style={{ color }}>
+              <span className="text-xs font-bold min-w-[90px] truncate" style={{ color }}>
                 {line.speaker}
               </span>
               {/* Timestamp */}
-              <span className="text-[10px] font-mono text-[var(--text3)] min-w-[36px] pt-0.5" style={{ fontFamily: 'var(--font-mono)' }}>
+              <span className="text-[10px] font-bold font-mono text-zinc-500 min-w-[42px] pt-0.5">
                 {formatTimestamp(line.timestamp)}
               </span>
               {/* Text */}
-              <span className="text-sm text-[var(--text2)] flex-1 group-hover:text-[var(--text)] transition-colors">
+              <span className="text-sm text-[var(--text2)] flex-1 group-hover:text-white transition-colors leading-relaxed font-semibold">
                 {highlightText(line.text)}
               </span>
             </button>
@@ -105,7 +105,7 @@ export function TranscriptView({ lines, onSeek }: TranscriptViewProps) {
         })}
 
         {filtered.length === 0 && (
-          <p className="text-sm text-[var(--text3)] text-center py-8">No matching lines found.</p>
+          <p className="text-sm text-[var(--text3)] text-center py-10 font-semibold">No matching transcript logs found.</p>
         )}
       </div>
     </div>

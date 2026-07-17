@@ -233,9 +233,10 @@ export function AudioRecorder() {
   const showProcessButton = phase === "stopped" && (audioBlob || uploadedFile)
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row gap-4 p-4 lg:p-6 overflow-hidden bg-[var(--bg)] relative w-full">
+    <div className="flex-1 flex flex-col lg:flex-row gap-6 p-4 lg:p-8 overflow-hidden bg-gradient-to-b from-[#05050c] to-[#0a0a16] relative w-full">
       {/* Spotlight blur background */}
-      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full bg-[var(--accent)]/5 blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-purple-600/10 blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-cyan-600/5 blur-[130px] pointer-events-none" />
 
       {/* PHASE: PROCESSING ( FUTURISTIC FULL-SCREEN OVERLAY ) */}
       <AnimatePresence>
@@ -244,25 +245,25 @@ export function AudioRecorder() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 bg-[var(--bg)]/95 backdrop-blur-lg flex flex-col items-center justify-center p-6"
+            className="absolute inset-0 z-50 bg-[#05050a]/90 backdrop-blur-xl flex flex-col items-center justify-center p-6"
           >
-            <div className="w-full max-w-md space-y-6 p-8 rounded-2xl border border-[var(--border)] bg-[var(--bg2)]/80 relative overflow-hidden shadow-2xl">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] animate-pulse" />
+            <div className="w-full max-w-md space-y-6 p-8 rounded-2xl border border-white/5 bg-black/40 relative overflow-hidden shadow-2xl glow-purple">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 animate-pulse" />
               
               <div className="text-center space-y-2">
-                <div className="inline-flex p-3 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] mb-2 animate-bounce">
-                  <Sparkles className="w-6 h-6" />
+                <div className="inline-flex p-3 rounded-full bg-purple-500/10 text-purple-400 mb-2 animate-bounce">
+                  <Sparkles className="w-6 h-6 animate-pulse" />
                 </div>
-                <h3 className="text-xl font-bold text-[var(--text)] font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-                  Synthesizing Meeting Notes
+                <h3 className="text-xl font-extrabold tracking-tight text-[var(--text)]">
+                  Synthesizing Notes
                 </h3>
-                <p className="text-xs text-[var(--text3)]">
-                  Recall.ai's cognitive engines are processing your capture.
+                <p className="text-xs text-[var(--text2)]">
+                  Recall.ai&apos;s cognitive engines are processing your capture.
                 </p>
               </div>
 
               {/* Progress Steps list */}
-              <div className="space-y-4 pt-4 border-t border-[var(--border)]">
+              <div className="space-y-4 pt-4 border-t border-white/5">
                 {steps.map((step, i) => (
                   <motion.div
                     key={step.name}
@@ -275,15 +276,15 @@ export function AudioRecorder() {
                       {step.state === 'done' ? (
                         <CheckCircle2 className="w-4 h-4 text-[var(--green)] flex-shrink-0" />
                       ) : step.state === 'active' ? (
-                        <Loader2 className="w-4 h-4 text-[var(--accent)] animate-spin flex-shrink-0" />
+                        <Loader2 className="w-4 h-4 text-purple-400 animate-spin flex-shrink-0" />
                       ) : (
-                        <div className="w-4 h-4 rounded-full border border-[var(--border)] flex-shrink-0" />
+                        <div className="w-4 h-4 rounded-full border border-white/10 flex-shrink-0" />
                       )}
                       <span className={`text-xs ${
                         step.state === 'done'
                           ? "text-[var(--text2)] line-through"
                           : step.state === 'active'
-                          ? "text-white font-medium"
+                          ? "text-white font-semibold"
                           : "text-[var(--text3)]"
                       }`}>
                         {step.label}
@@ -291,7 +292,7 @@ export function AudioRecorder() {
                     </div>
 
                     {step.state === 'active' && (
-                      <span className="text-[10px] text-[var(--accent2)] font-mono animate-pulse">
+                      <span className="text-[10px] text-pink-400 font-mono animate-pulse">
                         processing...
                       </span>
                     )}
@@ -305,12 +306,12 @@ export function AudioRecorder() {
               </div>
 
               {/* Glowing decorative indicator */}
-              <div className="pt-4 flex items-center justify-center gap-2 text-[10px] text-[var(--text3)]">
-                <span className="inline-flex px-1.5 py-0.5 rounded bg-[var(--border)] font-mono text-[8px] uppercase">
+              <div className="pt-4 flex items-center justify-center gap-2 text-[10px] text-[var(--text3)] border-t border-white/5">
+                <span className="inline-flex px-1.5 py-0.5 rounded bg-white/5 font-mono text-[8px] uppercase">
                   Whisper-v3
                 </span>
                 <span>•</span>
-                <span className="inline-flex px-1.5 py-0.5 rounded bg-[var(--border)] font-mono text-[8px] uppercase">
+                <span className="inline-flex px-1.5 py-0.5 rounded bg-white/5 font-mono text-[8px] uppercase">
                   Llama 3
                 </span>
               </div>
@@ -320,47 +321,47 @@ export function AudioRecorder() {
       </AnimatePresence>
 
       {/* LEFT COLUMN: THE CONCENTRIC SOUNDWAVE VISUAL CARD */}
-      <div className="flex-1 flex flex-col min-h-[300px] lg:min-h-0 bg-[var(--bg2)]/40 border border-[var(--border)] rounded-2xl p-6 overflow-hidden relative shadow-2xl backdrop-blur-md items-center justify-center">
+      <div className="flex-1 flex flex-col min-h-[350px] lg:min-h-0 glass-panel rounded-2xl p-6 overflow-hidden relative shadow-2xl items-center justify-center glow-purple">
         {/* Spotlight ambient glows */}
-        <div className="absolute w-[350px] h-[350px] rounded-full bg-[var(--accent)]/10 blur-[90px] pointer-events-none animate-pulse-slow" />
-        <div className="absolute w-[250px] h-[250px] rounded-full bg-[var(--accent2)]/5 blur-[70px] pointer-events-none animate-pulse-slow delay-1000" />
+        <div className="absolute w-[350px] h-[350px] rounded-full bg-purple-600/5 blur-[95px] pointer-events-none animate-pulse-slow" />
+        <div className="absolute w-[250px] h-[250px] rounded-full bg-pink-500/5 blur-[75px] pointer-events-none animate-pulse-slow delay-1000" />
         
         {/* Concentric rotating outer tech circles */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-[450px] h-[450px] rounded-full border border-[var(--border)]/15 opacity-40 animate-spin-slow" />
-          <div className="w-[340px] h-[340px] rounded-full border border-dashed border-[var(--border)]/20 opacity-60 animate-reverse-spin" />
-          <div className="w-[240px] h-[240px] rounded-full border border-[var(--accent)]/10 opacity-70" />
+          <div className="w-[450px] h-[450px] rounded-full border border-purple-500/5 opacity-40 animate-spin-slow" />
+          <div className="w-[340px] h-[340px] rounded-full border border-dashed border-pink-500/10 opacity-55 animate-reverse-spin" />
+          <div className="w-[240px] h-[240px] rounded-full border border-cyan-500/10 opacity-60" />
         </div>
 
         {/* Recording status indicator */}
         {phase === 'recording' && (
-          <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--red)]/30 bg-[var(--red)]/10 text-xs font-mono text-[var(--red)] shadow-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--red)] animate-ping" />
-            <span className="uppercase text-[9px] tracking-wider font-bold">Recording</span>
+          <div className="absolute top-6 left-6 flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--red)]/30 bg-[var(--red)]/10 text-xs font-mono text-[var(--red)] shadow-lg glow-pink">
+            <span className="w-2 h-2 rounded-full bg-[var(--red)] animate-ping" />
+            <span className="uppercase text-[9px] tracking-widest font-bold">REC STATUS: ACTIVE</span>
           </div>
         )}
 
         {/* Main interactive center illustrations */}
         <div className="relative z-10 w-full max-w-md flex flex-col items-center justify-center gap-6">
-          <div className="text-center space-y-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--accent2)]">
-              {phase === "recording" ? "STREAMING FREQUENCIES" : "RECORDER READY STATE"}
+          <div className="text-center space-y-2">
+            <span className="text-[10px] font-extrabold uppercase tracking-[0.35em] bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              {phase === "recording" ? "STREAMING AUDIO FREQUENCIES" : "RECORDER ENGINE DISPATCH"}
             </span>
-            <h2 className="text-2xl font-semibold text-[var(--text)] font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-              {phase === "recording" ? "Capturing Media..." : "Recall.ai Workspace"}
+            <h2 className="text-3xl font-extrabold text-white tracking-tight">
+              {phase === "recording" ? "Capturing Room Frequencies..." : "Audio Recording Deck"}
             </h2>
           </div>
 
           {/* Canvas representation */}
-          <div className="w-full py-4 relative">
+          <div className="w-full py-4 relative bg-black/20 rounded-2xl border border-white/5 shadow-inner">
             <WaveformCanvas isRecording={isRecording} stream={stream} />
           </div>
 
           <div className="text-center max-w-xs space-y-1">
-            <p className="text-xs text-[var(--text3)] leading-relaxed">
+            <p className="text-xs text-[var(--text2)] leading-relaxed">
               {phase === "recording" 
-                ? "Recording high-fidelity audio streams. Your voice is fully encrypted and captured in real-time."
-                : "Select your input mode inside the capsule selector on the right side and start recording."
+                ? "Streaming encrypted audio channels. Vocal codec compression is actively running."
+                : "Choose your audio target from the cockpit controller, configure strategy settings, and initialize."
               }
             </p>
           </div>
@@ -368,15 +369,15 @@ export function AudioRecorder() {
       </div>
 
       {/* RIGHT COLUMN: COCKPIT CONTROLS & GIANT RECORD DIAL */}
-      <div className="w-full lg:w-[360px] flex-shrink-0 flex flex-col gap-3 overflow-y-auto">
+      <div className="w-full lg:w-[380px] flex-shrink-0 flex flex-col gap-4 overflow-y-auto">
         
         {/* Input Mode Selector Horizontal Glassmorphic Capsule */}
         {phase === "idle" && (
-          <div className="space-y-1.5">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--text3)] px-1">
+          <div className="space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text2)] px-1">
               Select Capture Source
             </p>
-            <div className="grid grid-cols-2 p-1 rounded-xl bg-[var(--bg2)]/80 border border-[var(--border)] shadow-md gap-1">
+            <div className="grid grid-cols-2 p-1.5 rounded-xl bg-black/40 border border-white/5 shadow-xl gap-1">
               {[
                 { id: 'mic' as const, icon: Mic, label: 'Microphone' },
                 { id: 'upload' as const, icon: Upload, label: 'File Upload' },
@@ -389,10 +390,10 @@ export function AudioRecorder() {
                     setMode(m.id)
                   }}
                   className={`
-                    w-full flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-semibold transition-all cursor-pointer
+                    w-full flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer
                     ${mode === m.id
-                      ? "bg-gradient-to-tr from-[var(--accent)]/15 to-[var(--accent2)]/10 text-white border border-[var(--accent)]/30 shadow-sm"
-                      : "text-[var(--text3)] hover:text-[var(--text2)]"
+                      ? "bg-gradient-to-r from-purple-600/20 to-pink-600/10 text-white border border-purple-500/35 shadow-purple-500/10"
+                      : "text-zinc-500 hover:text-zinc-300"
                     }
                   `}
                 >
@@ -407,20 +408,20 @@ export function AudioRecorder() {
         {/* File Drag and Drop Zone if mode === 'upload' */}
         {phase === "idle" && mode === 'upload' && (
           isOptimizing ? (
-            <div className="border-2 border-dashed border-[var(--accent2)]/40 rounded-2xl p-6 text-center bg-[var(--accent2)]/5 transition-all animate-pulse">
-              <Loader2 className="w-8 h-8 mx-auto mb-2 text-[var(--accent2)] animate-spin" />
-              <p className="text-sm font-semibold text-white">Optimizing media file...</p>
-              <p className="text-xs text-[var(--text3)] mt-1">Extracting vocal track and downsampling to 16kHz mono WAV...</p>
+            <div className="border-2 border-dashed border-pink-500/30 rounded-2xl p-6 text-center bg-pink-500/5 transition-all animate-pulse">
+              <Loader2 className="w-8 h-8 mx-auto mb-2 text-pink-400 animate-spin" />
+              <p className="text-sm font-bold text-white">Optimizing media file...</p>
+              <p className="text-xs text-[var(--text2)] mt-1">Extracting voice track and downsampling to 16kHz mono...</p>
             </div>
           ) : (
             <div
               onClick={() => fileInputRef.current?.click()}
               onDragOver={handleDragOver}
               onDrop={handleDrop}
-              className="border-2 border-dashed border-[var(--border2)] rounded-2xl p-6 text-center cursor-pointer hover:border-[var(--accent2)]/40 hover:bg-[var(--accent2)]/5 transition-all animate-fade-in"
+              className="border-2 border-dashed border-white/10 rounded-2xl p-6 text-center cursor-pointer hover:border-pink-500/30 hover:bg-pink-500/5 transition-all animate-fade-in"
             >
-              <Upload className="w-8 h-8 mx-auto mb-2 text-[var(--accent2)] animate-pulse" />
-              <p className="text-sm font-semibold text-[var(--text)]">Click or Drag & Drop File</p>
+              <Upload className="w-8 h-8 mx-auto mb-2 text-pink-400 animate-pulse" />
+              <p className="text-sm font-bold text-white">Click or Drag & Drop File</p>
               <p className="text-xs text-[var(--text3)] mt-1">Accepts MP3, WAV, M4A, WEBM, MP4</p>
             </div>
           )
@@ -428,10 +429,10 @@ export function AudioRecorder() {
 
         {/* System Audio Warning Badge */}
         {phase === "idle" && mode === 'system' && (
-          <div className="p-4 rounded-xl bg-[var(--amber)]/5 border border-[var(--amber)]/20 flex gap-2 animate-fade-in">
-            <VolumeX className="w-4 h-4 text-[var(--amber)] flex-shrink-0 mt-0.5 animate-pulse" />
-            <p className="text-[11px] text-[var(--amber)] leading-relaxed font-sans">
-              <strong>System Audio Warning:</strong> Capturing audio requires sharing a tab/screen with the "Share audio" checked in the browser prompt. Chromium is recommended.
+          <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 flex gap-2.5 animate-fade-in">
+            <VolumeX className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5 animate-pulse" />
+            <p className="text-[11px] text-amber-400 leading-relaxed">
+              <strong>System Audio Warning:</strong> Capturing system sound requires sharing a tab/window with &apos;Share audio&apos; checked in the browser prompt.
             </p>
           </div>
         )}
@@ -440,19 +441,19 @@ export function AudioRecorder() {
         {phase === "idle" && mode === 'bot' && (
           <div className="space-y-4 animate-fade-in">
             {/* Autopilot Scheduler Form */}
-            <div className="p-5 rounded-2xl border border-[var(--border)] bg-[var(--bg2)]/60 backdrop-blur-md shadow-xl space-y-4">
-              <div className="flex items-center gap-2 pb-2.5 border-b border-[var(--border)]">
-                <Bot className="w-4 h-4 text-[var(--accent)]" />
+            <div className="p-5 rounded-2xl border border-white/5 bg-black/40 backdrop-blur-md shadow-xl space-y-4 glow-purple">
+              <div className="flex items-center gap-2 pb-2.5 border-b border-white/5">
+                <Bot className="w-4 h-4 text-purple-400" />
                 <div>
-                  <h3 className="text-xs font-bold text-[var(--text)] uppercase tracking-wider">Bot Autopilot Scheduler</h3>
-                  <p className="text-[10px] text-[var(--text3)]">Schedule a bot to join and record on your behalf</p>
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider">Bot Autopilot Scheduler</h3>
+                  <p className="text-[10px] text-[var(--text3)]">Send a virtual agent to record the meeting</p>
                 </div>
               </div>
 
               <div className="space-y-3">
                 {/* Meeting Link input */}
                 <div className="space-y-1">
-                  <label className="text-[9px] font-bold uppercase tracking-wider text-[var(--text3)]">
+                  <label className="text-[9px] font-bold uppercase tracking-wider text-[var(--text2)]">
                     Meeting Link (Google Meet, Zoom, Teams)
                   </label>
                   <input
@@ -471,12 +472,12 @@ export function AudioRecorder() {
                         setDetectedPlatform(null);
                       }
                     }}
-                    className="w-full px-3 py-2 rounded-xl bg-[var(--bg)] border border-[var(--border)] text-xs text-[var(--text)] outline-none focus:border-[var(--accent)]/50 font-medium placeholder:text-[var(--text3)]"
+                    className="w-full px-3 py-2.5 rounded-xl bg-black/30 border border-white/5 text-xs text-white outline-none focus:border-purple-500/50 font-semibold placeholder:text-[var(--text3)] transition-all"
                   />
                   
                   {detectedPlatform && (
                     <div className="flex items-center gap-1.5 pt-1">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-semibold border ${
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold border ${
                         detectedPlatform === "google-meet" 
                           ? "bg-green-500/10 text-green-400 border-green-500/20" 
                           : detectedPlatform === "zoom"
@@ -492,22 +493,20 @@ export function AudioRecorder() {
 
                 {/* Scheduled Time input */}
                 <div className="space-y-1">
-                  <label className="text-[9px] font-bold uppercase tracking-wider text-[var(--text3)]">
+                  <label className="text-[9px] font-bold uppercase tracking-wider text-[var(--text2)]">
                     Start Date & Time
                   </label>
-                  <div className="relative">
-                    <input
-                      type="datetime-local"
-                      value={botTime}
-                      onChange={(e) => setBotTime(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-[var(--bg)] border border-[var(--border)] text-xs text-[var(--text)] outline-none focus:border-[var(--accent)]/50 font-medium font-sans"
-                    />
-                  </div>
+                  <input
+                    type="datetime-local"
+                    value={botTime}
+                    onChange={(e) => setBotTime(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl bg-black/30 border border-white/5 text-xs text-white outline-none focus:border-purple-500/50 font-semibold transition-all"
+                  />
                 </div>
 
                 {/* Bot Custom Name input */}
                 <div className="space-y-1">
-                  <label className="text-[9px] font-bold uppercase tracking-wider text-[var(--text3)]">
+                  <label className="text-[9px] font-bold uppercase tracking-wider text-[var(--text2)]">
                     Bot Display Name
                   </label>
                   <input
@@ -515,7 +514,7 @@ export function AudioRecorder() {
                     placeholder="e.g. Recall Note Taker"
                     value={botName}
                     onChange={(e) => setBotName(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[var(--bg)] border border-[var(--border)] text-xs text-[var(--text)] outline-none focus:border-[var(--accent)]/50 font-medium placeholder:text-[var(--text3)]"
+                    className="w-full px-3 py-2.5 rounded-xl bg-black/30 border border-white/5 text-xs text-white outline-none focus:border-purple-500/50 font-semibold placeholder:text-[var(--text3)] transition-all"
                   />
                 </div>
               </div>
@@ -523,7 +522,7 @@ export function AudioRecorder() {
               <button
                 onClick={handleScheduleBot}
                 disabled={isScheduling || !botLink || !botTime}
-                className="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] hover:opacity-95 text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg shadow-[var(--accent)]/15 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-500/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isScheduling ? (
                   <>
@@ -541,17 +540,13 @@ export function AudioRecorder() {
           </div>
         )}
 
-
-
-
-
         {/* Uploaded File display */}
         {uploadedFile && phase === "stopped" && (
-          <div className="p-4 rounded-xl bg-[var(--bg3)] border border-[var(--border)] text-xs text-[var(--text2)] flex items-center justify-between shadow-sm animate-fade-in">
-            <div className="flex items-center gap-2 truncate">
+          <div className="p-4 rounded-xl bg-purple-500/5 border border-white/5 text-xs text-[var(--text2)] flex items-center justify-between shadow-sm animate-fade-in">
+            <div className="flex items-center gap-2.5 truncate">
               <span className="text-lg">📎</span>
               <div className="truncate">
-                <p className="font-semibold text-[var(--text)] truncate">{uploadedFile.name}</p>
+                <p className="font-bold text-white truncate">{uploadedFile.name}</p>
                 <p className="text-[10px] text-[var(--text3)] font-mono">{(uploadedFile.size / 1024 / 1024).toFixed(1)} MB</p>
               </div>
             </div>
@@ -560,7 +555,7 @@ export function AudioRecorder() {
                 setUploadedFile(null)
                 setPhase("idle")
               }}
-              className="text-[var(--text3)] hover:text-[var(--text)] transition-colors"
+              className="text-[var(--text3)] hover:text-white transition-colors"
               title="Remove file"
             >
               ×
@@ -570,10 +565,10 @@ export function AudioRecorder() {
 
         {/* AI Strategy Settings Box (collapsible or floating) */}
         {(phase === "idle" || phase === "stopped") && (
-          <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--bg2)]/60 backdrop-blur-md shadow-lg space-y-3">
-            <div className="flex items-center gap-2 pb-2.5 border-b border-[var(--border)]">
-              <Sliders className="w-4 h-4 text-[var(--accent2)]" />
-              <h3 className="text-xs font-bold text-[var(--text)] uppercase tracking-wider">AI Processing Strategy</h3>
+          <div className="p-4 rounded-xl border border-white/5 bg-black/40 backdrop-blur-md shadow-lg space-y-3.5">
+            <div className="flex items-center gap-2 pb-2.5 border-b border-white/5">
+              <Sliders className="w-4 h-4 text-pink-400" />
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider">AI Processing Strategy</h3>
             </div>
 
             {/* Toggle checkboxes */}
@@ -583,10 +578,10 @@ export function AudioRecorder() {
                   type="checkbox"
                   checked={settings.diarize}
                   onChange={(e) => setSettings(prev => ({ ...prev, diarize: e.target.checked }))}
-                  className="rounded border-[var(--border)] text-[var(--accent)] focus:ring-[var(--accent)]/50 bg-[var(--bg)] w-4 h-4"
+                  className="rounded border-white/10 text-purple-600 focus:ring-purple-500/40 bg-black/40 w-4 h-4"
                 />
                 <div>
-                  <p className="text-xs font-semibold text-[var(--text)] group-hover:text-[var(--accent)] transition-colors">
+                  <p className="text-xs font-bold text-white group-hover:text-purple-400 transition-colors">
                     Speaker Diarization
                   </p>
                   <p className="text-[10px] text-[var(--text3)]">De-noise and group by speaker voice</p>
@@ -598,10 +593,10 @@ export function AudioRecorder() {
                   type="checkbox"
                   checked={settings.actions}
                   onChange={(e) => setSettings(prev => ({ ...prev, actions: e.target.checked }))}
-                  className="rounded border-[var(--border)] text-[var(--accent)] focus:ring-[var(--accent)]/50 bg-[var(--bg)] w-4 h-4"
+                  className="rounded border-white/10 text-purple-600 focus:ring-purple-500/40 bg-black/40 w-4 h-4"
                 />
                 <div>
-                  <p className="text-xs font-semibold text-[var(--text)] group-hover:text-[var(--accent)] transition-colors">
+                  <p className="text-xs font-bold text-white group-hover:text-purple-400 transition-colors">
                     Action Items Extraction
                   </p>
                   <p className="text-[10px] text-[var(--text3)]">Auto-assign tasks and priorities</p>
@@ -612,13 +607,13 @@ export function AudioRecorder() {
             {/* Dropdown Options */}
             <div className="grid grid-cols-2 gap-3 pt-2">
               <div className="space-y-1">
-                <label className="text-[9px] font-bold uppercase tracking-wider text-[var(--text3)] flex items-center gap-1">
-                  <Globe className="w-3 h-3 text-[var(--text3)]" /> Language
+                <label className="text-[9px] font-bold uppercase tracking-wider text-[var(--text2)] flex items-center gap-1">
+                  <Globe className="w-3 h-3 text-zinc-500" /> Language
                 </label>
                 <select
                   value={settings.language}
                   onChange={(e) => setSettings(prev => ({ ...prev, language: e.target.value }))}
-                  className="w-full px-2 py-1.5 rounded-lg bg-[var(--bg)] border border-[var(--border)] text-xs text-[var(--text)] outline-none focus:border-[var(--accent)]/50 font-medium"
+                  className="w-full px-2 py-2 rounded-lg bg-black/35 border border-white/5 text-xs text-white outline-none focus:border-purple-500/50 font-semibold"
                 >
                   <option value="en">English (US)</option>
                   <option value="hi">Hindi (IN)</option>
@@ -629,13 +624,13 @@ export function AudioRecorder() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[9px] font-bold uppercase tracking-wider text-[var(--text3)] flex items-center gap-1">
-                  <FileText className="w-3 h-3 text-[var(--text3)]" /> Summary
+                <label className="text-[9px] font-bold uppercase tracking-wider text-[var(--text2)] flex items-center gap-1">
+                  <FileText className="w-3 h-3 text-zinc-500" /> Summary
                 </label>
                 <select
                   value={settings.style}
                   onChange={(e) => setSettings(prev => ({ ...prev, style: e.target.value }))}
-                  className="w-full px-2 py-1.5 rounded-lg bg-[var(--bg)] border border-[var(--border)] text-xs text-[var(--text)] outline-none focus:border-[var(--accent)]/50 font-medium"
+                  className="w-full px-2 py-2 rounded-lg bg-black/35 border border-white/5 text-xs text-white outline-none focus:border-purple-500/50 font-semibold"
                 >
                   <option value="detailed">Executive Brief</option>
                   <option value="bullet">Bullet Points</option>
@@ -673,7 +668,7 @@ export function AudioRecorder() {
                 <motion.div
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute w-24 h-24 rounded-full bg-[var(--accent)]/10 blur-md pointer-events-none"
+                  className="absolute w-24 h-24 rounded-full bg-purple-500/10 blur-md pointer-events-none"
                 />
               )}
             </AnimatePresence>
@@ -684,8 +679,8 @@ export function AudioRecorder() {
                 relative w-20 h-20 rounded-full flex flex-col items-center justify-center
                 transition-all duration-500 shadow-2xl cursor-pointer group z-10
                 ${isRecording
-                  ? "bg-gradient-to-tr from-[var(--red)] to-[#ff4d4d] text-white hover:scale-105"
-                  : "bg-gradient-to-tr from-[var(--accent)] to-[var(--accent2)] text-white hover:scale-105 hover:shadow-[var(--accent)]/20 hover:shadow-2xl"
+                  ? "bg-gradient-to-tr from-red-600 to-pink-600 text-white hover:scale-105 shadow-red-500/30"
+                  : "bg-gradient-to-tr from-purple-600 to-pink-600 text-white hover:scale-105 shadow-purple-500/20 glow-purple"
                 }
               `}
             >
@@ -694,7 +689,7 @@ export function AudioRecorder() {
               
               {isRecording ? (
                 <>
-                  <Square className="w-6 h-6 mb-0.5 animate-pulse text-white" />
+                  <Square className="w-6 h-6 mb-0.5 text-white" />
                   <span className="text-[9px] font-bold uppercase tracking-wider text-white/80">STOP</span>
                 </>
               ) : (
@@ -714,11 +709,11 @@ export function AudioRecorder() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
-              className="space-y-2.5 pt-2"
+              className="space-y-3 pt-2"
             >
               <button
                 onClick={handleProcess}
-                className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] hover:opacity-95 text-white text-sm font-bold flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-[var(--accent)]/15 cursor-pointer hover:scale-[1.01]"
+                className="w-full py-4 px-4 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600 hover:opacity-95 text-white text-sm font-extrabold flex items-center justify-center gap-2.5 transition-all shadow-xl shadow-purple-500/20 cursor-pointer hover:scale-[1.01]"
               >
                 <Sparkles className="w-4 h-4 animate-pulse" />
                 Process Capture with AI
@@ -726,7 +721,7 @@ export function AudioRecorder() {
               
               <button
                 onClick={handleReRecord}
-                className="w-full py-2.5 px-4 rounded-xl border border-[var(--border)] text-xs text-[var(--text3)] hover:text-[var(--text)] hover:bg-[var(--bg2)]/60 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 px-4 rounded-xl border border-white/10 text-xs text-[var(--text2)] hover:text-white hover:bg-white/5 transition-all cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 Start Over / Discard
@@ -743,7 +738,6 @@ export function AudioRecorder() {
           onChange={handleFileChange}
           className="hidden"
         />
-
 
       </div>
     </div>

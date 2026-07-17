@@ -74,83 +74,104 @@ END:VCALENDAR`;
   }
 
   return (
-    <div className="space-y-2">
-      <AnimatePresence>
-        {localItems.map((item, i) => (
-          <motion.div
-            key={item.id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className={`flex items-start gap-3 p-3 rounded-lg border border-[var(--border)] bg-[var(--card)] group ${item.done ? "opacity-50" : ""}`}
-          >
-            {/* Checkbox */}
-            <input
-              type="checkbox"
-              checked={item.done}
-              onChange={() => toggleDone(item.id)}
-              className="mt-0.5 w-4 h-4 rounded accent-[var(--accent)] cursor-pointer"
-            />
+    <div className="glass-panel p-6 rounded-2xl shadow-xl space-y-4">
+      <div className="flex items-center justify-between pb-3 border-b border-white/5">
+        <h3 className="text-sm font-extrabold text-white uppercase tracking-wider">Action Items Checklist</h3>
+        <span className="text-[10px] px-2 py-0.5 rounded bg-purple-500/15 text-purple-400 border border-purple-500/25 font-bold">
+          {localItems.filter(i => i.done).length} / {localItems.length} COMPLETED
+        </span>
+      </div>
 
-            {/* Text + metadata */}
-            <div className="flex-1 min-w-0">
-              <p className={`text-sm ${item.done ? "line-through text-[var(--text3)]" : "text-[var(--text)]"}`}>
-                {item.text}
-              </p>
-              <div className="flex items-center gap-2 mt-1">
-                <span
-                  className="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded"
-                  style={{
-                    color: getPriorityColor(item.priority),
-                    backgroundColor: getPriorityColor(item.priority) + '15',
-                  }}
-                >
-                  {item.priority}
-                </span>
-                {item.assignee && (
-                  <span className="text-[10px] text-[var(--text3)]">→ {item.assignee}</span>
-                )}
+      <div className="space-y-2">
+        <AnimatePresence>
+          {localItems.map((item, i) => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className={`flex items-start gap-4 p-4 rounded-xl border border-white/5 bg-black/30 group transition-all ${item.done ? "opacity-45 bg-black/10" : "hover:border-white/10 hover:bg-black/40"}`}
+            >
+              {/* Checkbox */}
+              <input
+                type="checkbox"
+                checked={item.done}
+                onChange={() => toggleDone(item.id)}
+                className="mt-0.5 w-4 h-4 rounded accent-purple-600 focus:ring-purple-500/40 bg-black/40 cursor-pointer"
+              />
+
+              {/* Text + metadata */}
+              <div className="flex-1 min-w-0">
+                <p className={`text-sm font-semibold leading-relaxed ${item.done ? "line-through text-zinc-500" : "text-zinc-200"}`}>
+                  {item.text}
+                </p>
+                <div className="flex items-center gap-2 mt-2 font-bold text-[9px] uppercase tracking-wider">
+                  <span
+                    className="px-2 py-0.5 rounded"
+                    style={{
+                      color: getPriorityColor(item.priority),
+                      backgroundColor: getPriorityColor(item.priority) + '15',
+                      border: `1px solid ${getPriorityColor(item.priority)}20`
+                    }}
+                  >
+                    {item.priority}
+                  </span>
+                  {item.assignee && (
+                    <span className="text-zinc-500">Assignee: <span className="text-zinc-400">{item.assignee}</span></span>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Actions: Email & Calendar */}
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
-              <button onClick={() => generateCalendarInvite(item)} className="p-1.5 rounded-md hover:bg-[var(--bg3)] text-[var(--text3)] hover:text-[var(--accent)] transition-colors" title="Generate Calendar Invite">
-                <Calendar className="w-4 h-4" />
-              </button>
-              <button onClick={() => draftEmail(item)} className="p-1.5 rounded-md hover:bg-[var(--bg3)] text-[var(--text3)] hover:text-[var(--accent)] transition-colors" title="Draft Email">
-                <Mail className="w-4 h-4" />
-              </button>
-            </div>
-          </motion.div>
-        ))}
-      </AnimatePresence>
+              {/* Actions: Email & Calendar */}
+              <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+                <button 
+                  onClick={() => generateCalendarInvite(item)} 
+                  className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-all cursor-pointer shadow-sm" 
+                  title="Generate Calendar Invite"
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                </button>
+                <button 
+                  onClick={() => draftEmail(item)} 
+                  className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-all cursor-pointer shadow-sm" 
+                  title="Draft Email"
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
 
-      {/* Add new item */}
-      {showInput ? (
-        <div className="flex items-center gap-2 p-2 rounded-lg border border-[var(--accent)]/20 bg-[var(--card)]">
-          <input
-            type="text"
-            value={newText}
-            onChange={(e) => setNewText(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="New action item..."
-            autoFocus
-            className="flex-1 bg-transparent text-sm text-[var(--text)] placeholder:text-[var(--text3)] outline-none"
-          />
-          <button onClick={() => { setShowInput(false); setNewText("") }} className="text-[var(--text3)] hover:text-[var(--text)]">
-            <X className="w-4 h-4" />
+        {/* Add new item */}
+        {showInput ? (
+          <div className="flex items-center gap-2.5 p-3 rounded-xl border border-purple-500/30 bg-black/40 shadow-inner">
+            <input
+              type="text"
+              value={newText}
+              onChange={(e) => setNewText(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Type your action task, then press Enter..."
+              autoFocus
+              className="flex-1 bg-transparent text-sm text-white placeholder:text-[var(--text3)] outline-none font-semibold"
+            />
+            <button 
+              onClick={() => { setShowInput(false); setNewText("") }} 
+              className="text-zinc-500 hover:text-white p-1 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowInput(true)}
+            className="flex items-center justify-center gap-2 w-full p-3.5 rounded-xl border border-dashed border-white/10 text-xs text-zinc-500 hover:text-purple-400 hover:border-purple-500/35 hover:bg-purple-500/5 transition-all cursor-pointer font-bold uppercase tracking-wider mt-2 bg-white/[0.01]"
+          >
+            <Plus className="w-4 h-4" />
+            Add new action item
           </button>
-        </div>
-      ) : (
-        <button
-          onClick={() => setShowInput(true)}
-          className="flex items-center gap-2 w-full p-2 rounded-lg text-sm text-[var(--text3)] hover:text-[var(--accent)] hover:bg-[var(--accent)]/5 transition-all"
-        >
-          <Plus className="w-4 h-4" />
-          Add action item
-        </button>
-      )}
+        )}
+      </div>
     </div>
   )
 }

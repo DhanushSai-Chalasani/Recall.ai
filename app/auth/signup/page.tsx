@@ -98,18 +98,22 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-[var(--bg)] flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden selection:bg-purple-500/30">
+      {/* Ambient background glows */}
+      <div className="absolute top-[30%] left-[20%] w-[350px] h-[350px] bg-purple-600/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-pink-500/10 blur-[130px] rounded-full pointer-events-none" />
+
       {/* Logo */}
-      <Link href="/" className="flex items-center gap-2.5 mb-10 group">
-        <div className="w-9 h-9 rounded-xl bg-[var(--accent)] flex items-center justify-center shadow-lg shadow-[var(--accent)]/30 group-hover:shadow-[var(--accent)]/50 transition-shadow">
-          <Mic className="w-4.5 h-4.5 text-white" />
+      <Link href="/" className="flex items-center gap-2.5 mb-8 group relative z-10">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/25 group-hover:scale-105 transition-transform">
+          <Mic className="w-5 h-5 text-white" />
         </div>
-        <span className="text-2xl font-bold text-[var(--text)]" style={{ fontFamily: "var(--font-serif)" }}>
-          Recall.ai
+        <span className="text-2xl font-bold tracking-tight text-[var(--text)] font-sans">
+          Recall<span className="text-purple-400">.ai</span>
         </span>
       </Link>
 
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md relative z-10 glass-panel p-8 rounded-2xl glow-purple">
         <AnimatePresence mode="wait">
           {emailSent ? (
             /* ── Email sent success screen ───────────── */
@@ -126,26 +130,26 @@ export default function SignUpPage() {
                 </div>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-[var(--text)] mb-2" style={{ fontFamily: "var(--font-serif)" }}>
+                <h1 className="text-2xl font-extrabold text-[var(--text)] mb-2">
                   Check your inbox
                 </h1>
                 <p className="text-sm text-[var(--text2)] leading-relaxed">
                   We&apos;ve sent a confirmation link to{" "}
                   <span className="font-semibold text-[var(--text)]">{email}</span>.
-                  Click it to activate your account and start recording.
+                  Click it to activate your account.
                 </p>
               </div>
-              <div className="p-4 rounded-xl bg-[var(--accent)]/5 border border-[var(--accent)]/10 text-left space-y-2">
+              <div className="p-4 rounded-xl bg-purple-500/5 border border-white/5 text-left space-y-2.5">
                 {["Check your spam folder if you don't see the email.", "The link expires after 24 hours.", "Once confirmed, you'll be taken to your dashboard."].map((tip) => (
                   <div key={tip} className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[var(--accent)] flex-shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
                     <p className="text-xs text-[var(--text2)]">{tip}</p>
                   </div>
                 ))}
               </div>
               <Link
                 href="/auth/login"
-                className="inline-flex items-center gap-1.5 text-sm text-[var(--accent)] hover:underline"
+                className="inline-flex items-center gap-1.5 text-sm text-purple-400 hover:text-purple-300 font-semibold"
               >
                 Back to Sign In <ArrowRight className="w-3.5 h-3.5" />
               </Link>
@@ -157,18 +161,18 @@ export default function SignUpPage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -16 }}
-              className="space-y-7"
+              className="space-y-6"
             >
               <div className="text-center">
-                <h1 className="text-3xl font-bold text-[var(--text)]" style={{ fontFamily: "var(--font-serif)" }}>
-                  Create your account
+                <h1 className="text-2xl font-extrabold tracking-tight text-[var(--text)]">
+                  Create Account
                 </h1>
-                <p className="mt-1.5 text-sm text-[var(--text2)]">Start capturing meetings in seconds</p>
+                <p className="mt-2 text-sm text-[var(--text2)]">Start capturing meetings in seconds</p>
               </div>
 
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="email" className="text-[var(--text2)] text-xs font-medium uppercase tracking-wide">Email</Label>
+                  <Label htmlFor="email" className="text-[var(--text2)] text-xs font-semibold uppercase tracking-wider">Email</Label>
                   <Input
                     id="email"
                     type="email"
@@ -176,11 +180,11 @@ export default function SignUpPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-[var(--bg2)] border-[var(--border)] text-[var(--text)] placeholder:text-[var(--text3)] focus:border-[var(--accent)]/60"
+                    className="bg-black/30 border-white/5 text-[var(--text)] placeholder:text-[var(--text3)] focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/35 h-11 rounded-xl transition-all"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="password" className="text-[var(--text2)] text-xs font-medium uppercase tracking-wide">Password</Label>
+                  <Label htmlFor="password" className="text-[var(--text2)] text-xs font-semibold uppercase tracking-wider">Password</Label>
                   <Input
                     id="password"
                     type="password"
@@ -188,11 +192,11 @@ export default function SignUpPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="At least 6 characters"
-                    className="bg-[var(--bg2)] border-[var(--border)] text-[var(--text)] placeholder:text-[var(--text3)] focus:border-[var(--accent)]/60"
+                    className="bg-black/30 border-white/5 text-[var(--text)] placeholder:text-[var(--text3)] focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/35 h-11 rounded-xl transition-all"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="repeat-password" className="text-[var(--text2)] text-xs font-medium uppercase tracking-wide">Confirm Password</Label>
+                  <Label htmlFor="repeat-password" className="text-[var(--text2)] text-xs font-semibold uppercase tracking-wider">Confirm Password</Label>
                   <Input
                     id="repeat-password"
                     type="password"
@@ -200,7 +204,7 @@ export default function SignUpPage() {
                     value={repeatPassword}
                     onChange={(e) => setRepeatPassword(e.target.value)}
                     placeholder="Repeat your password"
-                    className="bg-[var(--bg2)] border-[var(--border)] text-[var(--text)] placeholder:text-[var(--text3)] focus:border-[var(--accent)]/60"
+                    className="bg-black/30 border-white/5 text-[var(--text)] placeholder:text-[var(--text3)] focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/35 h-11 rounded-xl transition-all"
                   />
                 </div>
 
@@ -210,7 +214,7 @@ export default function SignUpPage() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="rounded-lg bg-[var(--red)]/10 border border-[var(--red)]/20 px-3 py-2.5 text-sm text-[var(--red)]"
+                      className="rounded-xl bg-[var(--red)]/10 border border-[var(--red)]/20 px-3 py-3 text-xs font-medium text-[var(--red)]"
                     >
                       {error}
                     </motion.div>
@@ -219,7 +223,7 @@ export default function SignUpPage() {
 
                 <Button
                   type="submit"
-                  className="w-full py-3 bg-[var(--accent)] hover:bg-[var(--accent)]/90 text-white font-semibold shadow-lg shadow-[var(--accent)]/20 transition-all"
+                  className="w-full py-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold rounded-xl shadow-lg shadow-purple-500/20 transition-all border border-purple-500/20"
                   disabled={isLoading}
                 >
                   {isLoading ? "Creating account…" : "Create Account"}
@@ -230,7 +234,7 @@ export default function SignUpPage() {
                 Already have an account?{" "}
                 <Link
                   href={returnUrl ? `/auth/login?returnUrl=${encodeURIComponent(returnUrl)}` : "/auth/login"}
-                  className="text-[var(--accent)] hover:underline font-medium"
+                  className="text-purple-400 hover:text-purple-300 hover:underline font-semibold"
                 >
                   Sign in
                 </Link>
