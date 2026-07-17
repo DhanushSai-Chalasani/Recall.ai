@@ -130,17 +130,22 @@ export function AudioRecorder() {
 
     setPhase("processing")
     setProcessingSteps(steps)
-    const result = await process(blob, settings, "New Meeting")
-    if (result) {
-      setResult(result)
-      setPhase("complete")
-      toast.success("Meeting processed!", { description: `${result.stats.wordCount.toLocaleString()} words transcribed` })
-      window.dispatchEvent(new CustomEvent("meetings-updated"))
-      // Redirect to the newly created meeting details page
-      router.push(`/meetings/${result.id}`)
-    } else {
+    try {
+      const result = await process(blob, settings, "New Meeting")
+      if (result && result.id) {
+        setResult(result)
+        setPhase("complete")
+        toast.success("Meeting processed!", { description: `${result.stats.wordCount.toLocaleString()} words transcribed` })
+        window.dispatchEvent(new CustomEvent("meetings-updated"))
+        // Redirect to the newly created meeting details page
+        router.push(`/meetings/${result.id}`)
+      } else {
+        setPhase("stopped")
+        // Error toast already shown by useProcessAudio hook
+      }
+    } catch {
+      // Error already shown via toast in useProcessAudio
       setPhase("stopped")
-      toast.error("Processing failed", { description: "Please try again." })
     }
   }
 
@@ -211,7 +216,10 @@ export function AudioRecorder() {
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) handleFileSelect(file)
-  }, [])
+    // Reset input so the same file can be re-selected if needed
+    e.target.value = ""
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleFileSelect])
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -221,7 +229,8 @@ export function AudioRecorder() {
     e.preventDefault()
     const file = e.dataTransfer.files?.[0]
     if (file) handleFileSelect(file)
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleFileSelect])
 
   function handleReRecord() {
     resetTimer()

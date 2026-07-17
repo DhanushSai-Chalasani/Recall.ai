@@ -121,26 +121,71 @@ const worker = new Worker(
       if (isGoogleMeet) {
         console.log(`[Job ${job.id}] Platform: Google Meet. Entering lobby details...`);
         
-        // Google Meet usually prompts for name in an input
-        const nameInputSelector = 'input[type="text"]';
-        await page.waitForSelector(nameInputSelector, { timeout: 15000 }).catch(() => {});
-        if (await page.locator(nameInputSelector).isVisible()) {
-          await page.fill(nameInputSelector, botName);
+        // Wait for the page to fully load, then look for the name input
+        await page.waitForTimeout(3000);
+
+        // Google Meet lobby name input — try multiple specific selectors in order of reliability
+        const gmNameSelectors = [
+          'input[placeholder*="name" i]',           // e.g. "Your name" placeholder
+          'input[aria-label*="name" i]',            // Aria label containing "name"
+          'input[jsname][type="text"]',             // Google-specific jsname attribute
+          '.VfPpkd-fmcmS input[type="text"]',       // Material Design input wrapper
+          'input[type="text"]',                     // Generic fallback
+        ];
+
+        let nameInputFilled = false;
+        for (const selector of gmNameSelectors) {
+          try {
+            const el = page.locator(selector).first();
+            const visible = await el.isVisible({ timeout: 2000 }).catch(() => false);
+            if (visible) {
+              await el.click();
+              await el.fill("");  // clear any existing value
+              await el.type(botName, { delay: 50 }); // type slowly to avoid detection
+              console.log(`[Job ${job.id}] Filled bot name '${botName}' using selector: ${selector}`);
+              nameInputFilled = true;
+              break;
+            }
+          } catch {
+            // try next selector
+          }
+        }
+
+        if (!nameInputFilled) {
+          console.warn(`[Job ${job.id}] Could not find name input in Google Meet lobby. Bot may join as Anonymous.`);
         }
 
         // Mute camera & microphone beforehand using keyboard shortcuts
-        // Google Meet: Ctrl+d (mic), Ctrl+e (camera)
-        console.log(`[Job ${job.id}] Disabling mic and camera via Google Meet shortcuts...`);
         await page.keyboard.press("Control+d");
         await page.keyboard.press("Control+e");
         await page.waitForTimeout(1000);
 
-        // Click "Ask to join" or "Join now"
-        const joinButton = page.locator('button:has-text("Ask to join"), button:has-text("Join now")');
-        await joinButton.waitFor({ state: "visible", timeout: 10000 }).catch(() => {});
-        if (await joinButton.isVisible()) {
-          await joinButton.click();
-          console.log(`[Job ${job.id}] Clicked join button. Requesting room access...`);
+        // Click "Ask to join" or "Join now" — try text-based and aria-label-based selectors
+        const joinSelectors = [
+          'button:has-text("Ask to join")',
+          'button:has-text("Join now")',
+          'button[jsname="Qx7uuf"]',           // Google Meet's internal jsname for join
+          'button[data-idom-class*="join" i]',
+        ];
+
+        let clicked = false;
+        for (const sel of joinSelectors) {
+          try {
+            const btn = page.locator(sel).first();
+            const visible = await btn.isVisible({ timeout: 3000 }).catch(() => false);
+            if (visible) {
+              await btn.click();
+              console.log(`[Job ${job.id}] Clicked join button: ${sel}`);
+              clicked = true;
+              break;
+            }
+          } catch {
+            // try next
+          }
+        }
+
+        if (!clicked) {
+          console.warn(`[Job ${job.id}] Could not find Google Meet join button. Bot may not be admitted.`);
         }
       } else if (isZoom) {
         console.log(`[Job ${job.id}] Platform: Zoom. Redirecting to Web Client...`);
@@ -190,20 +235,32 @@ const worker = new Worker(
       console.log(`[Job ${job.id}] Checking lobby admission status (5 min timeout)...`);
       while (lobbyElapsed < lobbyTimeoutMs) {
         // Check if we're past the lobby by looking for meeting-active indicators
-        const inMeeting = await page.evaluate(() => {
-          // Google Meet: participant list or main call view present
-          const meetIndicators = document.querySelectorAll(
-            '[data-participant-id], [data-self-name], [class*="participant"], [data-meeting-title]'
+        const admissionState = await page.evaluate(() => {
+          // POSITIVE indicators: elements that only appear INSIDE an active meeting
+          const meetingActiveIndicators = document.querySelectorAll(
+            '[data-participant-id], [data-self-name], [data-meeting-title], [jsname="r4nke"]'
           );
-          // Also check if "Ask to join" or lobby text is GONE
-          const lobbyText = document.body.innerText;
-          const stillInLobby = lobbyText.includes('Asking to be let in') || 
-                               lobbyText.includes('waiting') ||
-                               lobbyText.includes('Your meeting code');
-          return meetIndicators.length > 0 || !stillInLobby;
-        }).catch(() => false);
+          
+          // LOBBY indicators: text that appears only while waiting to be admitted
+          const bodyText = document.body?.innerText || '';
+          const inLobby = bodyText.includes('Asking to be let in') || 
+                          bodyText.includes('waiting to be let in') ||
+                          bodyText.includes('Ask to join') ||
+                          bodyText.includes('Waiting for') ||
+                          bodyText.includes('Your meeting code');
 
-        if (inMeeting) {
+          // Only return admitted=true if we see meeting indicators, NOT just absence of lobby text.
+          // The absence of lobby text could mean we're on a sign-in page, not in the meeting.
+          return {
+            admitted: meetingActiveIndicators.length > 0,
+            inLobby,
+            pageTitle: document.title,
+          };
+        }).catch(() => ({ admitted: false, inLobby: false, pageTitle: '' }));
+
+        console.log(`[Job ${job.id}] Lobby check: admitted=${admissionState.admitted}, inLobby=${admissionState.inLobby}, title="${admissionState.pageTitle}"`);
+
+        if (admissionState.admitted) {
           console.log(`[Job ${job.id}] Successfully admitted to meeting.`);
           break;
         }

@@ -49,7 +49,6 @@ export function useProcessAudio() {
     setSteps(createInitialSteps())
 
     try {
-      // Try real API first
       const formData = new FormData()
       const filename = (audioBlob as any).name || 'recording.webm'
       formData.append('audio', audioBlob, filename)
@@ -66,8 +65,6 @@ export function useProcessAudio() {
       // Step 1: transcribing
       advanceStep(1)
 
-      let data: MeetingResult | null = null
-
       const res = await fetch('/api/process-audio', {
         method: 'POST',
         body: formData,
@@ -75,43 +72,55 @@ export function useProcessAudio() {
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}))
+        
+        // Handle specific case for missing API keys
+        if (res.status === 402 || errorData.code === 'MISSING_API_KEYS') {
+          console.warn("API Keys missing, falling back to Demo Mode")
+          
+          for (let i = 2; i < STEP_NAMES.length; i++) {
+            advanceStep(i)
+            await new Promise(r => setTimeout(r, 450))
+          }
+          
+          const fallbackData: MeetingResult = {
+            ...MOCK_MEETING,
+            name: meetingName,
+            suggestedTitle: meetingName
+          }
+          
+          setSteps(prev => prev.map(s => ({ ...s, state: 'done' as const })))
+          setResult(fallbackData)
+          toast.info("Using Demo Mode sample data (API keys not configured)")
+          return fallbackData
+        }
+
         throw new Error(errorData.error || 'Failed to process audio')
       }
 
-      data = await res.json()
+      const data: MeetingResult = await res.json()
 
       // Step 2: analysing
       advanceStep(2)
+      await new Promise(r => setTimeout(r, STEP_DELAYS[2]))
 
       // Step 3: extracting
       advanceStep(3)
+      await new Promise(r => setTimeout(r, STEP_DELAYS[3]))
 
       // Step 4: saving
       advanceStep(4)
+      await new Promise(r => setTimeout(r, STEP_DELAYS[4]))
 
       // All done
       setSteps(prev => prev.map(s => ({ ...s, state: 'done' as const })))
       setResult(data)
       return data
-    } catch (err) {
-      console.warn("Backend processing failed, falling back to Demo Mode:", err)
-      
-      // Simulate completing remaining steps for smooth UI
-      for (let i = 1; i < STEP_NAMES.length; i++) {
-        advanceStep(i)
-        await new Promise(r => setTimeout(r, 450))
-      }
-      
-      const fallbackData: MeetingResult = {
-        ...MOCK_MEETING,
-        name: "AI Generated Meeting Title",
-        suggestedTitle: "AI Generated Meeting Title"
-      }
-      
-      setSteps(prev => prev.map(s => ({ ...s, state: 'done' as const })))
-      setResult(fallbackData)
-      toast.info("Using Demo Mode sample data (API or database was unavailable)")
-      return fallbackData
+    } catch (err: any) {
+      console.error("Processing error:", err)
+      const message = err.message || 'An unexpected error occurred'
+      setError(message)
+      toast.error(message)
+      throw err
     } finally {
       setIsProcessing(false)
     }
