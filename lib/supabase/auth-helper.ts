@@ -34,7 +34,7 @@ export async function getAuthenticatedUser(req: NextRequest) {
       // Use a lightweight Supabase client to validate the JWT token
       const supabase = createSupabaseClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
           auth: {
             autoRefreshToken: false,
@@ -74,7 +74,7 @@ export async function getAuthenticatedUser(req: NextRequest) {
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
           getAll() {

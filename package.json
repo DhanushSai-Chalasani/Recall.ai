@@ -2,11 +2,14 @@
   "name": "recall-ai",
   "version": "0.1.0",
   "private": true,
+  "main": "electron-main.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "electron:dev": "electron .",
+    "build:desktop": "node scripts/build-desktop.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -47,8 +50,34 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "electron": "^43.1.1",
+    "electron-builder": "^26.15.3",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
     "typescript": "^5"
+  },
+  "build": {
+    "appId": "com.recallai.app",
+    "productName": "RecallAI",
+    "npmRebuild": false,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "package.json",
+      "electron-main.js",
+      ".next/standalone/**/*",
+      ".env"
+    ],
+    "asar": false,
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "runAfterFinish": true
+    }
   }
 }

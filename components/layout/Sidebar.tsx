@@ -7,8 +7,16 @@ import {
   Mic, Clock, Settings, Menu, X,
   Smile, Frown, HelpCircle,
   PanelLeftClose, PanelLeftOpen,
-  Search, Pin, Trash2, Archive, Star
+  Search, Pin, Trash2, Archive, Star,
+  MoreHorizontal, Edit2, Download, Share
 } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { motion, AnimatePresence } from "framer-motion"
 import { SettingsModal } from "./SettingsModal"
 import { useTheme } from "@/contexts/theme-context"
@@ -108,6 +116,100 @@ export function Sidebar() {
       alert("An error occurred while deleting the meeting.")
     }
   }
+
+  const renameMeeting = async (meetingId: string, currentName: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const newName = prompt("Enter new meeting name:", currentName)
+    if (!newName || newName === currentName) return
+
+    try {
+      const res = await fetch(`/api/meetings/${meetingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newName })
+      })
+      if (res.ok) {
+        setMeetings(prev => prev.map(m => m.id === meetingId ? { ...m, name: newName } : m))
+        window.dispatchEvent(new CustomEvent("meetings-updated"))
+      } else {
+        alert("Failed to rename meeting.")
+      }
+    } catch (err) {
+      console.error(err)
+      alert("An error occurred while renaming the meeting.")
+    }
+  }
+
+  const archiveMeeting = async (meetingId: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!confirm("Are you sure you want to archive this meeting?")) return
+
+    try {
+      const res = await fetch(`/api/meetings/${meetingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ insights: { is_archived: true } })
+      })
+      if (res.ok) {
+        setMeetings(prev => prev.map(m => {
+          if (m.id === meetingId) {
+            return { ...m, insights: { ...(m.insights || {}), is_archived: true } }
+          }
+          return m
+        }))
+        window.dispatchEvent(new CustomEvent("meetings-updated"))
+        if (pathname === `/meetings/${meetingId}`) {
+          router.push("/meetings")
+        }
+      } else {
+        alert("Failed to archive meeting.")
+      }
+    } catch (err) {
+      console.error(err)
+      alert("An error occurred while archiving the meeting.")
+    }
+  }
+
+  const shareMeeting = (meetingId: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const url = `${window.location.origin}/meetings/${meetingId}`
+    navigator.clipboard.writeText(url)
+    alert("Link copied to clipboard!")
+  }
+
+  const downloadMeeting = (meeting: any, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    let text = `Meeting: ${meeting.name}\n\n`
+    if (meeting.tldr) text += `TLDR:\n${meeting.tldr}\n\n`
+    if (meeting.action_items?.length) {
+      text += `Action Items:\n`
+      meeting.action_items.forEach((item: any) => {
+        text += `- ${item.description || item}\n`
+      })
+      text += `\n`
+    }
+    if (meeting.transcript?.length) {
+      text += `Transcript:\n`
+      meeting.transcript.forEach((line: any) => {
+        text += `[${line.speaker}]: ${line.text}\n`
+      })
+    }
+    
+    const blob = new Blob([text], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `${meeting.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_notes.txt`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
 
   const filteredMeetings = meetings.filter(m =>
     m.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
@@ -304,21 +406,39 @@ export function Sidebar() {
                           <s.icon className="w-3 h-3 flex-shrink-0" style={{ color: s.color }} />
                           <span className="truncate flex-1">{meeting.name}</span>
                         </Link>
-                        <div className="absolute right-2 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center gap-1 z-10">
-                          <button
-                            onClick={(e) => togglePin(meeting.id, e)}
-                            title="Unpin meeting"
-                            className="p-1 rounded hover:bg-[var(--bg3)] text-[var(--text3)] hover:text-[var(--accent2)] transition-colors"
-                          >
-                            <Pin className="w-3 h-3 fill-[var(--accent2)] text-[var(--accent2)]" />
-                          </button>
-                          <button
-                            onClick={(e) => deleteMeeting(meeting.id, e)}
-                            title="Delete meeting"
-                            className="p-1 rounded hover:bg-[var(--bg3)] text-[var(--text3)] hover:text-[var(--red)] transition-colors"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-10 bg-gradient-to-l from-[var(--bg2)] via-[var(--bg2)] to-transparent pl-6 pr-1 py-1">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                className="p-1 rounded hover:bg-[var(--bg3)] text-[var(--text3)] hover:text-[var(--text)] transition-colors"
+                              >
+                                <MoreHorizontal className="w-4 h-4" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48">
+                              <DropdownMenuItem onClick={(e) => renameMeeting(meeting.id, meeting.name, e)}>
+                                <Edit2 className="w-4 h-4 mr-2" /> Rename
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={(e) => shareMeeting(meeting.id, e)}>
+                                <Share className="w-4 h-4 mr-2" /> Share Link
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={(e) => downloadMeeting(meeting, e)}>
+                                <Download className="w-4 h-4 mr-2" /> Download Notes
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={(e) => togglePin(meeting.id, e)}>
+                                <Pin className="w-4 h-4 mr-2" /> {pinnedIds.includes(meeting.id) ? "Unpin" : "Pin to top"}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={(e) => archiveMeeting(meeting.id, e)}>
+                                <Archive className="w-4 h-4 mr-2" /> Archive
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={(e) => deleteMeeting(meeting.id, e)} className="text-red-500 focus:bg-red-500/10 focus:text-red-500">
+                                <Trash2 className="w-4 h-4 mr-2" /> Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </div>
                     )
@@ -352,21 +472,39 @@ export function Sidebar() {
                         <s.icon className="w-3 h-3 flex-shrink-0" style={{ color: s.color }} />
                         <span className="truncate flex-1">{meeting.name}</span>
                       </Link>
-                      <div className="absolute right-2 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center gap-1 z-10">
-                        <button
-                          onClick={(e) => togglePin(meeting.id, e)}
-                          title="Pin meeting"
-                          className="p-1 rounded hover:bg-[var(--bg3)] text-[var(--text3)] hover:text-[var(--accent2)] transition-colors"
-                        >
-                          <Pin className="w-3 h-3" />
-                        </button>
-                        <button
-                          onClick={(e) => deleteMeeting(meeting.id, e)}
-                          title="Delete meeting"
-                          className="p-1 rounded hover:bg-[var(--bg3)] text-[var(--text3)] hover:text-[var(--red)] transition-colors"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-10 bg-gradient-to-l from-[var(--bg2)] via-[var(--bg2)] to-transparent pl-6 pr-1 py-1">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                              className="p-1 rounded hover:bg-[var(--bg3)] text-[var(--text3)] hover:text-[var(--text)] transition-colors"
+                            >
+                              <MoreHorizontal className="w-4 h-4" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem onClick={(e) => renameMeeting(meeting.id, meeting.name, e)}>
+                              <Edit2 className="w-4 h-4 mr-2" /> Rename
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => shareMeeting(meeting.id, e)}>
+                              <Share className="w-4 h-4 mr-2" /> Share Link
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => downloadMeeting(meeting, e)}>
+                              <Download className="w-4 h-4 mr-2" /> Download Notes
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={(e) => togglePin(meeting.id, e)}>
+                              <Pin className="w-4 h-4 mr-2" /> {pinnedIds.includes(meeting.id) ? "Unpin" : "Pin to top"}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => archiveMeeting(meeting.id, e)}>
+                              <Archive className="w-4 h-4 mr-2" /> Archive
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={(e) => deleteMeeting(meeting.id, e)} className="text-red-500 focus:bg-red-500/10 focus:text-red-500">
+                              <Trash2 className="w-4 h-4 mr-2" /> Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
                   )
