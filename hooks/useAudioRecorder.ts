@@ -11,6 +11,16 @@ export function useAudioRecorder() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
 
+  const [activeMode, setActiveMode] = useState<'mic' | 'system' | 'upload' | null>(null)
+
+  const stop = useCallback(async () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+      mediaRecorderRef.current.stop()
+      setIsRecording(false)
+      setActiveMode(null)
+    }
+  }, [])
+
   const start = useCallback(async (mode: 'mic' | 'system' | 'upload' = 'mic') => {
     try {
       setError(null)
@@ -42,7 +52,19 @@ export function useAudioRecorder() {
         mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true })
       }
 
+      // Attach track onended listener to handle user clicking native "Stop sharing" or disconnecting mic
+      mediaStream.getTracks().forEach(track => {
+        track.onended = () => {
+          if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+            mediaRecorderRef.current.stop()
+            setIsRecording(false)
+            setActiveMode(null)
+          }
+        }
+      })
+
       setStream(mediaStream)
+      setActiveMode(mode)
 
       const mediaRecorder = new MediaRecorder(mediaStream, {
         mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
@@ -74,12 +96,5 @@ export function useAudioRecorder() {
     }
   }, [])
 
-  const stop = useCallback(async () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
-      mediaRecorderRef.current.stop()
-      setIsRecording(false)
-    }
-  }, [])
-
-  return { isRecording, audioBlob, stream, error, start, stop }
+  return { isRecording, activeMode, audioBlob, stream, error, start, stop }
 }

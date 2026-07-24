@@ -29,8 +29,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Get initial user
     const init = async () => {
-      // Check for local mock session first (perfect for offline Demo Mode)
-      const isMockSession = typeof document !== "undefined" && document.cookie.includes("sb-mock-session=true")
+      // SECURITY: Only allow mock session in non-production environments
+      const isMockSession = process.env.NODE_ENV !== "production" &&
+        typeof document !== "undefined" && document.cookie.includes("sb-mock-session=true")
       
       if (isMockSession) {
         console.log('[AuthContext] Mock session active')

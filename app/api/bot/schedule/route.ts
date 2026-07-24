@@ -70,7 +70,9 @@ export async function POST(req: NextRequest) {
       if (parsedUrl.protocol !== "https:") {
         return NextResponse.json({ error: "Only HTTPS meeting links are allowed." }, { status: 400 });
       }
-      const domainMatch = allowedDomains.some((domain) => parsedUrl.hostname.endsWith(domain));
+      // SSRF HARDENING: exact match or dot-prefixed subdomain only.
+      // endsWith("zoom.us") alone would match "evil-zoom.us".
+      const domainMatch = allowedDomains.some((domain) => parsedUrl.hostname === domain || parsedUrl.hostname.endsWith("." + domain));
       if (!domainMatch) {
         return NextResponse.json(
           { error: "Invalid meeting link. Only Google Meet, Zoom, and MS Teams links are supported." },

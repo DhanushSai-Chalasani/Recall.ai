@@ -43,6 +43,15 @@ export function Topbar() {
         {phase === "complete" && result && (
           <ExportDropdown result={result} />
         )}
+
+        {/* Profile Avatar button */}
+        <a
+          href="/profile"
+          className="w-8 h-8 rounded-full bg-gradient-to-tr from-[var(--accent)] to-[var(--accent2)] flex items-center justify-center text-xs font-bold text-white border border-white/20 shadow-md hover:scale-105 transition-transform cursor-pointer ml-1"
+          title="Account Profile"
+        >
+          R
+        </a>
       </div>
     </header>
   )

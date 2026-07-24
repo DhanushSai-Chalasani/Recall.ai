@@ -15,7 +15,9 @@ export async function updateSession(request: NextRequest) {
   }
   
   // Check for local mock session first (perfect for offline Demo Mode)
-  const isMockSession = request.cookies.get("sb-mock-session")?.value === "true"
+  // SECURITY: Only allow in non-production environments to prevent auth bypass on live deployments
+  const isMockSession = process.env.NODE_ENV !== "production" &&
+    request.cookies.get("sb-mock-session")?.value === "true"
 
   if (isMockSession) {
     user = {

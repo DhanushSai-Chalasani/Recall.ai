@@ -518,20 +518,34 @@ export function Sidebar() {
         <div className={`border-t border-[var(--border)] py-2 ${collapsed ? "px-0 flex flex-col items-center gap-1" : "px-3 space-y-0.5"}`}>
           <FooterBtn icon={Settings} label="Settings" onClick={() => setSettingsOpen(true)} />
 
-          {/* User pill — expanded only */}
-          {!collapsed && (
-            <div className="flex items-center gap-2.5 px-3 py-2 mt-1 rounded-lg bg-gradient-to-r from-purple-950/20 to-indigo-950/20 border border-purple-500/10 shadow-[0_0_15px_rgba(165,148,249,0.05)]">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[var(--accent)] to-[var(--accent2)] flex items-center justify-center text-xs font-bold text-white flex-shrink-0 border border-white/10 shadow-[0_0_10px_rgba(124,110,240,0.3)]">
+          {/* User pill — interactive link to /profile */}
+          {!collapsed ? (
+            <Link
+              href="/profile"
+              className="flex items-center gap-2.5 px-3 py-2 mt-1 rounded-xl bg-gradient-to-r from-purple-950/20 to-indigo-950/20 hover:from-purple-900/30 hover:to-indigo-900/30 border border-purple-500/15 hover:border-purple-500/30 shadow-[0_0_15px_rgba(165,148,249,0.05)] transition-all cursor-pointer group"
+              title="View & Edit Profile"
+            >
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[var(--accent)] to-[var(--accent2)] flex items-center justify-center text-xs font-bold text-white flex-shrink-0 border border-white/10 shadow-[0_0_10px_rgba(124,110,240,0.3)] group-hover:scale-105 transition-transform">
                 R
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-[var(--text)] truncate leading-tight">Rishikesh</p>
+                <p className="text-xs font-semibold text-[var(--text)] truncate leading-tight group-hover:text-[var(--accent)] transition-colors">
+                  Rishikesh
+                </p>
                 <div className="flex items-center gap-1 mt-0.5">
                   <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400 animate-pulse" />
                   <span className="text-[9px] font-bold text-amber-400 tracking-wider uppercase">Premium</span>
                 </div>
               </div>
-            </div>
+            </Link>
+          ) : (
+            <Link
+              href="/profile"
+              className="w-10 h-10 mx-auto mt-1 rounded-full bg-gradient-to-tr from-[var(--accent)] to-[var(--accent2)] flex items-center justify-center text-xs font-bold text-white border border-white/10 shadow-lg hover:scale-110 transition-transform cursor-pointer"
+              title="View Profile"
+            >
+              R
+            </Link>
           )}
         </div>
       </motion.nav>

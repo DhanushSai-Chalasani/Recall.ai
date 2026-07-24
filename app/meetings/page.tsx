@@ -212,6 +212,9 @@ export default function MeetingsPage() {
               ) : (
                 <p className="text-sm text-[var(--text2)] leading-relaxed">
                   <span className="font-extrabold text-purple-400">Vault AI: </span>
+                {/* SAFETY INVARIANT: aiResponse is rendered as a React text node via {} interpolation,
+                    which auto-escapes all HTML/JS. Do NOT replace with dangerouslySetInnerHTML or an
+                    unsanitized markdown renderer without first adding rehype-sanitize or equivalent. */}
                   {aiResponse}
                 </p>
               )}

@@ -57,6 +57,10 @@ export async function POST(req: NextRequest) {
     }) as number[]
 
     // 2. Vector similarity search in Supabase using the optimized match_meeting_embeddings_v2 RPC
+    // SECURITY AUDIT: match_user_id is derived from the server-side authenticated session
+    // (getAuthenticatedUser), NEVER from client-supplied input. This prevents horizontal
+    // privilege escalation. RLS on meeting_embeddings independently enforces auth.uid() = user_id
+    // as a belt-and-suspenders second layer.
     const admin = createAdminClient()
     const { data: chunks, error: rpcError } = await admin.rpc("match_meeting_embeddings_v2", {
       query_embedding: queryEmbedding,

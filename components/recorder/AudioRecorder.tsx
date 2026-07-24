@@ -242,10 +242,59 @@ export function AudioRecorder() {
   const showProcessButton = phase === "stopped" && (audioBlob || uploadedFile)
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row gap-6 p-4 lg:p-8 overflow-hidden bg-gradient-to-b from-[#05050c] to-[#0a0a16] relative w-full">
+    <div className="flex-1 flex flex-col lg:flex-row gap-6 p-4 lg:p-8 overflow-hidden bg-[var(--bg)] transition-colors duration-300 relative w-full">
       {/* Spotlight blur background */}
       <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-purple-600/10 blur-[150px] pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-cyan-600/5 blur-[130px] pointer-events-none" />
+
+      {/* FLOATING RECORDING HUD CONTROL DOCK ( High Visibility Screen Recording Bar ) */}
+      <AnimatePresence>
+        {isRecording && (
+          <motion.div
+            initial={{ opacity: 0, y: -24, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -24, scale: 0.95 }}
+            className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3.5 px-5 py-2.5 rounded-full bg-[var(--card)]/95 backdrop-blur-xl border border-[var(--red)]/50 shadow-2xl glow-pink"
+          >
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
+              </span>
+              <span className="text-[11px] font-mono font-bold text-red-500 tracking-widest uppercase">
+                REC ACTIVE
+              </span>
+            </div>
+
+            <div className="h-4 w-[1px] bg-[var(--border)]" />
+
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--text)]">
+              {mode === 'system' ? (
+                <>
+                  <Monitor className="w-4 h-4 text-cyan-400 animate-pulse" />
+                  <span>System Audio & Screen Capture</span>
+                </>
+              ) : (
+                <>
+                  <Mic className="w-4 h-4 text-purple-400 animate-pulse" />
+                  <span>Microphone Live</span>
+                </>
+              )}
+            </div>
+
+            <div className="h-4 w-[1px] bg-[var(--border)]" />
+
+            <button
+              onClick={handleStop}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white text-xs font-extrabold uppercase tracking-wider shadow-md shadow-red-500/25 transition-all hover:scale-105 cursor-pointer"
+              title="Stop Recording"
+            >
+              <Square className="w-3.5 h-3.5 fill-white text-white" />
+              <span>STOP RECORDING</span>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* PHASE: PROCESSING ( FUTURISTIC FULL-SCREEN OVERLAY ) */}
       <AnimatePresence>
@@ -254,9 +303,9 @@ export function AudioRecorder() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 bg-[#05050a]/90 backdrop-blur-xl flex flex-col items-center justify-center p-6"
+            className="absolute inset-0 z-50 bg-[var(--bg)]/90 backdrop-blur-xl flex flex-col items-center justify-center p-6"
           >
-            <div className="w-full max-w-md space-y-6 p-8 rounded-2xl border border-white/5 bg-black/40 relative overflow-hidden shadow-2xl glow-purple">
+            <div className="w-full max-w-md space-y-6 p-8 rounded-2xl border border-[var(--border)] bg-[var(--card)] relative overflow-hidden shadow-2xl glow-purple">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 animate-pulse" />
               
               <div className="text-center space-y-2">
@@ -272,7 +321,7 @@ export function AudioRecorder() {
               </div>
 
               {/* Progress Steps list */}
-              <div className="space-y-4 pt-4 border-t border-white/5">
+              <div className="space-y-4 pt-4 border-t border-[var(--border)]">
                 {steps.map((step, i) => (
                   <motion.div
                     key={step.name}
@@ -287,13 +336,13 @@ export function AudioRecorder() {
                       ) : step.state === 'active' ? (
                         <Loader2 className="w-4 h-4 text-purple-400 animate-spin flex-shrink-0" />
                       ) : (
-                        <div className="w-4 h-4 rounded-full border border-white/10 flex-shrink-0" />
+                        <div className="w-4 h-4 rounded-full border border-[var(--border)] flex-shrink-0" />
                       )}
                       <span className={`text-xs ${
                         step.state === 'done'
                           ? "text-[var(--text2)] line-through"
                           : step.state === 'active'
-                          ? "text-white font-semibold"
+                          ? "text-[var(--text)] font-semibold"
                           : "text-[var(--text3)]"
                       }`}>
                         {step.label}
@@ -315,12 +364,12 @@ export function AudioRecorder() {
               </div>
 
               {/* Glowing decorative indicator */}
-              <div className="pt-4 flex items-center justify-center gap-2 text-[10px] text-[var(--text3)] border-t border-white/5">
-                <span className="inline-flex px-1.5 py-0.5 rounded bg-white/5 font-mono text-[8px] uppercase">
+              <div className="pt-4 flex items-center justify-center gap-2 text-[10px] text-[var(--text3)] border-t border-[var(--border)]">
+                <span className="inline-flex px-1.5 py-0.5 rounded bg-[var(--bg2)] font-mono text-[8px] uppercase">
                   Whisper-v3
                 </span>
                 <span>•</span>
-                <span className="inline-flex px-1.5 py-0.5 rounded bg-white/5 font-mono text-[8px] uppercase">
+                <span className="inline-flex px-1.5 py-0.5 rounded bg-[var(--bg2)] font-mono text-[8px] uppercase">
                   Llama 3
                 </span>
               </div>
@@ -337,9 +386,9 @@ export function AudioRecorder() {
         
         {/* Concentric rotating outer tech circles */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-[450px] h-[450px] rounded-full border border-purple-500/5 opacity-40 animate-spin-slow" />
-          <div className="w-[340px] h-[340px] rounded-full border border-dashed border-pink-500/10 opacity-55 animate-reverse-spin" />
-          <div className="w-[240px] h-[240px] rounded-full border border-cyan-500/10 opacity-60" />
+          <div className="w-[450px] h-[450px] rounded-full border border-purple-500/10 opacity-40 animate-spin-slow" />
+          <div className="w-[340px] h-[340px] rounded-full border border-dashed border-pink-500/15 opacity-55 animate-reverse-spin" />
+          <div className="w-[240px] h-[240px] rounded-full border border-cyan-500/15 opacity-60" />
         </div>
 
         {/* Recording status indicator */}
@@ -356,13 +405,13 @@ export function AudioRecorder() {
             <span className="text-[10px] font-extrabold uppercase tracking-[0.35em] bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
               {phase === "recording" ? "STREAMING AUDIO FREQUENCIES" : "RECORDER ENGINE DISPATCH"}
             </span>
-            <h2 className="text-3xl font-extrabold text-white tracking-tight">
+            <h2 className="text-3xl font-extrabold text-[var(--text)] tracking-tight">
               {phase === "recording" ? "Capturing Room Frequencies..." : "Audio Recording Deck"}
             </h2>
           </div>
 
           {/* Canvas representation */}
-          <div className="w-full py-4 relative bg-black/20 rounded-2xl border border-white/5 shadow-inner">
+          <div className="w-full py-4 relative bg-[var(--card2)]/50 rounded-2xl border border-[var(--border)] shadow-inner">
             <WaveformCanvas isRecording={isRecording} stream={stream} />
           </div>
 
