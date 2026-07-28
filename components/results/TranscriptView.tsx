@@ -10,7 +10,6 @@ interface TranscriptViewProps {
   onSeek?: (timestamp: number) => void
 }
 
-// Keyword highlight patterns
 const HIGHLIGHT_PATTERNS = [/deadline/gi, /budget/gi, /decision/gi, /action/gi, /blocker/gi]
 
 function highlightText(text: string): React.ReactNode {
@@ -28,7 +27,7 @@ function highlightText(text: string): React.ReactNode {
         result.push(segment)
         if (matches[i]) {
           result.push(
-            <mark key={`${i}-${matches[i]}`} className="bg-[var(--accent)]/20 text-[var(--accent2)] px-0.5 rounded">
+            <mark key={`${i}-${matches[i]}`} className="bg-primary/20 text-primary px-1 py-0.5 rounded font-medium">
               {matches[i]}
             </mark>
           )
@@ -41,7 +40,6 @@ function highlightText(text: string): React.ReactNode {
   return <>{parts}</>
 }
 
-// Build speaker index map for color assignment
 function buildSpeakerIndex(lines: TranscriptLine[]): Map<string, number> {
   const map = new Map<string, number>()
   let idx = 0
@@ -62,21 +60,21 @@ export function TranscriptView({ lines, onSeek }: TranscriptViewProps) {
     : lines
 
   return (
-    <div className="glass-panel p-6 rounded-2xl shadow-xl space-y-4">
+    <div className="bg-card border border-border p-5 rounded-xl shadow-xs space-y-3">
       {/* Search bar */}
-      <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-black/40 border border-white/5 focus-within:border-purple-500/50 focus-within:ring-1 focus-within:ring-purple-500/35 transition-all">
-        <Search className="w-4 h-4 text-zinc-500" />
+      <div className="flex items-center gap-2.5 px-3 py-2 rounded-md bg-background border border-border focus-within:border-primary transition-all">
+        <Search className="w-4 h-4 text-muted-foreground" />
         <input
           type="text"
-          placeholder="Search keywords inside transcript..."
+          placeholder="Filter transcript keywords..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 bg-transparent text-sm text-[var(--text)] placeholder:text-[var(--text3)] outline-none font-semibold"
+          className="flex-1 bg-transparent text-xs text-foreground placeholder:text-muted-foreground outline-none font-medium"
         />
       </div>
 
       {/* Transcript lines */}
-      <div className="max-h-[400px] overflow-y-auto space-y-1.5 pr-2 scrollbar-thin">
+      <div className="max-h-[420px] overflow-y-auto space-y-1 pr-1">
         {filtered.map((line, i) => {
           const color = getSpeakerColor(speakerIndex.get(line.speaker) ?? 0)
           return (
@@ -86,18 +84,15 @@ export function TranscriptView({ lines, onSeek }: TranscriptViewProps) {
                 onSeek?.(line.timestamp)
                 window.dispatchEvent(new CustomEvent('seek-audio', { detail: line.timestamp }))
               }}
-              className="w-full text-left flex items-start gap-4 p-3 rounded-xl hover:bg-purple-600/10 border border-transparent hover:border-purple-500/10 transition-all group cursor-pointer"
+              className="w-full text-left flex items-start gap-3 p-2.5 rounded-md hover:bg-muted/60 transition-colors group cursor-pointer"
             >
-              {/* Speaker name */}
-              <span className="text-xs font-bold min-w-[90px] truncate" style={{ color }}>
+              <span className="text-xs font-semibold min-w-[85px] truncate" style={{ color }}>
                 {line.speaker}
               </span>
-              {/* Timestamp */}
-              <span className="text-[10px] font-bold font-mono text-zinc-500 min-w-[42px] pt-0.5">
+              <span className="text-[10px] font-mono text-muted-foreground min-w-[40px] pt-0.5">
                 {formatTimestamp(line.timestamp)}
               </span>
-              {/* Text */}
-              <span className="text-sm text-[var(--text2)] flex-1 group-hover:text-white transition-colors leading-relaxed font-semibold">
+              <span className="text-xs text-foreground flex-1 leading-relaxed">
                 {highlightText(line.text)}
               </span>
             </button>
@@ -105,7 +100,7 @@ export function TranscriptView({ lines, onSeek }: TranscriptViewProps) {
         })}
 
         {filtered.length === 0 && (
-          <p className="text-sm text-[var(--text3)] text-center py-10 font-semibold">No matching transcript logs found.</p>
+          <p className="text-xs text-muted-foreground text-center py-8">No matching transcript lines found.</p>
         )}
       </div>
     </div>

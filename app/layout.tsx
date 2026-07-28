@@ -1,14 +1,13 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { DM_Serif_Display, Plus_Jakarta_Sans, DM_Mono } from "next/font/google"
+import { Inter, DM_Mono } from "next/font/google"
 import { SubscriptionProvider } from "@/contexts/subscription-context"
 import { AuthProvider } from "@/contexts/auth-context"
 import { ThemeProvider } from "@/contexts/theme-context"
 import { Toaster } from "sonner"
 import "./globals.css"
 
-const serif = DM_Serif_Display({ subsets: ["latin"], weight: ["400"], variable: "--font-serif" })
-const sans = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-sans" })
+const sans = Inter({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-sans" })
 const mono = DM_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono" })
 
 export const metadata: Metadata = {
@@ -29,8 +28,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`} suppressHydrationWarning>
-      <body className="antialiased flex flex-col min-h-screen" style={{ fontFamily: 'var(--font-sans)' }}>
+    <html lang="en" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
+      <body className="antialiased flex flex-col min-h-screen font-sans">
         <AuthProvider>
           <ThemeProvider>
             <SubscriptionProvider>
@@ -45,7 +44,7 @@ export default function RootLayout({
           toastOptions={{
             style: {
               background: 'var(--card)',
-              color: 'var(--text)',
+              color: 'var(--foreground)',
               border: '1px solid var(--border)',
             },
           }}

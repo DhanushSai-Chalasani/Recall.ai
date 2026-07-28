@@ -4,8 +4,7 @@ import { useParams, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { ArrowLeft, Clock, Users, FileText, CheckSquare, Archive, Trash2 } from "lucide-react"
-import { formatMinSec } from "@/lib/utils"
+import { ArrowLeft, Archive, Trash2, FileText as FileTextIcon, MessageSquare, CheckSquare, Lightbulb } from "lucide-react"
 import { StatsRow } from "@/components/results/StatsRow"
 import { SpeakerChips } from "@/components/results/SpeakerChips"
 import { TLDRCard } from "@/components/results/TLDRCard"
@@ -14,7 +13,6 @@ import { ActionItemList } from "@/components/results/ActionItemList"
 import { InsightsPanel } from "@/components/results/InsightsPanel"
 import { ExportDropdown } from "@/components/shared/ExportDropdown"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { FileText as FileTextIcon, MessageSquare, Lightbulb } from "lucide-react"
 import { toast } from "sonner"
 
 export default function MeetingDetailPage() {
@@ -87,18 +85,18 @@ export default function MeetingDetailPage() {
   }, [id])
 
   if (isLoading) {
-    return <div className="flex-1 flex items-center justify-center p-12 text-[var(--text3)]">Loading meeting details...</div>
+    return <div className="flex-1 flex items-center justify-center p-12 text-xs text-muted-foreground">Loading meeting details...</div>
   }
 
   if (!meeting) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-12">
-        <h2 className="text-lg font-semibold text-[var(--text)] mb-2" style={{ fontFamily: 'var(--font-serif)' }}>
+        <h2 className="text-base font-semibold text-foreground mb-2">
           Meeting not found
         </h2>
-        <p className="text-sm text-[var(--text3)] mb-4">This meeting doesn&apos;t exist or has been deleted.</p>
-        <Link href="/meetings" className="text-sm text-[var(--accent)] hover:underline flex items-center gap-1">
-          <ArrowLeft className="w-4 h-4" /> Back to meetings
+        <p className="text-xs text-muted-foreground mb-4">This meeting doesn&apos;t exist or has been deleted.</p>
+        <Link href="/meetings" className="text-xs text-primary hover:underline flex items-center gap-1 font-medium">
+          <ArrowLeft className="w-3.5 h-3.5" /> Back to meetings
         </Link>
       </div>
     )
@@ -110,48 +108,48 @@ export default function MeetingDetailPage() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex-1 p-6 lg:p-10 overflow-y-auto bg-gradient-to-b from-[#05050c] to-[#0a0a16] selection:bg-purple-500/30"
+      className="flex-1 p-6 lg:p-8 overflow-y-auto bg-background"
     >
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-8">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
         <div>
           <Link
             href="/meetings"
-            className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-purple-400 font-bold uppercase tracking-wider mb-4 transition-colors"
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground font-medium mb-3 transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back to meetings
           </Link>
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl font-extrabold tracking-tight text-white">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
               {meeting.name}
             </h1>
             {meeting.insights?.meetingType && (
-              <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[10px] font-bold text-white bg-gradient-to-r from-purple-600 to-pink-500 border border-white/10 shadow-sm">
-                ✨ {meeting.insights.meetingType}
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary border border-primary/20">
+                {meeting.insights.meetingType}
               </span>
             )}
           </div>
-          <p className="text-xs text-[var(--text2)] mt-2 font-semibold">
+          <p className="text-xs text-muted-foreground mt-1 font-mono">
             {date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             {' • '}
             {date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
 
-        <div className="flex items-center gap-2 mt-4 md:mt-0">
+        <div className="flex items-center gap-2 mt-2 md:mt-0">
           <button
             onClick={handleToggleArchive}
             disabled={isArchiving}
-            className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-white/5 bg-black/45 text-xs font-bold text-[var(--text2)] hover:text-white hover:bg-white/5 transition-all disabled:opacity-50 cursor-pointer shadow-md"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border bg-card text-xs font-medium text-foreground hover:bg-muted transition-all disabled:opacity-50 cursor-pointer shadow-xs"
             title={meeting.insights?.is_archived ? "Restore Meeting" : "Archive Meeting"}
           >
-            <Archive className={`w-3.5 h-3.5 ${meeting.insights?.is_archived ? "fill-purple-400 text-purple-400" : ""}`} />
+            <Archive className={`w-3.5 h-3.5 ${meeting.insights?.is_archived ? "fill-primary text-primary" : ""}`} />
             <span>{meeting.insights?.is_archived ? "Restore" : "Archive"}</span>
           </button>
           
           <button
             onClick={handleDelete}
-            className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-white/5 bg-black/45 text-xs font-bold text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition-all cursor-pointer shadow-md"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border bg-card text-xs font-medium text-destructive hover:bg-destructive/10 transition-all cursor-pointer shadow-xs"
             title="Delete Meeting"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -169,62 +167,62 @@ export default function MeetingDetailPage() {
       <SpeakerChips speakers={meeting.speakers} />
 
       {/* Tabs */}
-      <Tabs defaultValue="tldr" className="w-full mt-6">
-        <TabsList className="w-full grid grid-cols-4 p-1.5 bg-black/40 border border-white/5 rounded-2xl gap-1">
+      <Tabs defaultValue="tldr" className="w-full mt-4">
+        <TabsList className="w-full grid grid-cols-4 p-1 bg-muted border border-border rounded-lg gap-1">
           <TabsTrigger 
             value="tldr" 
-            className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+            className="flex items-center justify-center gap-1.5 py-2 rounded-md text-xs font-medium transition-all cursor-pointer"
           >
             <FileTextIcon className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">TLDR</span>
           </TabsTrigger>
           <TabsTrigger 
             value="transcript" 
-            className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+            className="flex items-center justify-center gap-1.5 py-2 rounded-md text-xs font-medium transition-all cursor-pointer"
           >
             <MessageSquare className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Transcript</span>
           </TabsTrigger>
           <TabsTrigger 
             value="actions" 
-            className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+            className="flex items-center justify-center gap-1.5 py-2 rounded-md text-xs font-medium transition-all cursor-pointer"
           >
             <CheckSquare className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Actions</span>
-            <span className="ml-1 text-[9px] px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-400 border border-purple-500/25">
-              {meeting.actionItems.length}
+            <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-primary/15 text-primary font-mono">
+              {meeting.actionItems?.length || 0}
             </span>
           </TabsTrigger>
           <TabsTrigger 
             value="insights" 
-            className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+            className="flex items-center justify-center gap-1.5 py-2 rounded-md text-xs font-medium transition-all cursor-pointer"
           >
             <Lightbulb className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Insights</span>
           </TabsTrigger>
         </TabsList>
 
-        <div className="mt-6">
+        <div className="mt-4">
           <TabsContent value="tldr">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
               <TLDRCard result={meeting} />
             </motion.div>
           </TabsContent>
 
           <TabsContent value="transcript">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
               <TranscriptView lines={meeting.transcript} />
             </motion.div>
           </TabsContent>
 
           <TabsContent value="actions">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
               <ActionItemList items={meeting.actionItems} />
             </motion.div>
           </TabsContent>
 
           <TabsContent value="insights">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
               <InsightsPanel insights={meeting.insights} speakers={meeting.speakers} />
             </motion.div>
           </TabsContent>

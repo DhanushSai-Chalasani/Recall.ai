@@ -44,10 +44,10 @@ export function ModeSelector({ mode, onChange, onFileSelect }: ModeSelectorProps
 
   return (
     <div className="space-y-3">
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text3)]">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
         Input Mode
       </p>
-      <div className="flex gap-1 p-1 rounded-lg bg-[var(--bg)] border border-[var(--border)]">
+      <div className="flex gap-1 p-1 rounded-lg bg-muted border border-border">
         {MODES.map(m => (
           <button
             key={m.id}
@@ -55,8 +55,8 @@ export function ModeSelector({ mode, onChange, onFileSelect }: ModeSelectorProps
             className={`
               flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md text-xs font-medium transition-all
               ${mode === m.id
-                ? "bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20"
-                : "text-[var(--text3)] hover:text-[var(--text2)]"
+                ? "bg-card text-foreground border border-border font-semibold shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
               }
             `}
           >
@@ -72,19 +72,19 @@ export function ModeSelector({ mode, onChange, onFileSelect }: ModeSelectorProps
           onClick={() => fileInputRef.current?.click()}
           onDragOver={handleDragOver}
           onDrop={handleDrop}
-          className="border-2 border-dashed border-[var(--border2)] rounded-xl p-6 text-center cursor-pointer hover:border-[var(--accent)]/40 transition-colors"
+          className="border border-dashed border-border rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
         >
-          <Upload className="w-6 h-6 mx-auto mb-2 text-[var(--text3)]" />
-          <p className="text-sm text-[var(--text2)]">Click or drag file here</p>
-          <p className="text-xs text-[var(--text3)] mt-1">.mp3, .wav, .m4a, .webm, .mp4</p>
+          <Upload className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
+          <p className="text-sm font-medium text-foreground">Click or drag file here</p>
+          <p className="text-xs text-muted-foreground mt-1">.mp3, .wav, .m4a, .webm, .mp4</p>
         </div>
       )}
 
       {/* System audio warning */}
       {mode === 'system' && (
-        <div className="p-3 rounded-lg bg-[var(--amber)]/5 border border-[var(--amber)]/20">
-          <p className="text-xs text-[var(--amber)]">
-            ⚠ System audio capture requires a Chromium browser and screen share. Not all browsers support this.
+        <div className="p-3 rounded-lg bg-warning/10 border border-warning/20">
+          <p className="text-xs text-foreground">
+            ⚠ System audio capture requires sharing a browser tab/window with audio enabled.
           </p>
         </div>
       )}

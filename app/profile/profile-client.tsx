@@ -1,6 +1,5 @@
 "use client"
 
-import { Navigation } from "@/components/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import {
@@ -14,8 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { CreditCard, LogOut, Trash2, Sparkles } from "lucide-react"
-import Link from "next/link"
+import { CreditCard, LogOut, Trash2, Sparkles, User, Shield } from "lucide-react"
 import { useState } from "react"
 import { useSubscription } from "@/contexts/subscription-context"
 import { toast } from "sonner"
@@ -28,7 +26,7 @@ interface ProfileClientProps {
 }
 
 export function ProfileClient({ user }: ProfileClientProps) {
-  const { isPro, tier, downgradeToFree, refresh } = useSubscription()
+  const { isPro, downgradeToFree } = useSubscription()
   const [isDeleting, setIsDeleting] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [isDowngrading, setIsDowngrading] = useState(false)
@@ -87,143 +85,142 @@ export function ProfileClient({ user }: ProfileClientProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-
-      <div className="container mx-auto px-6 py-12">
-        <div className="max-w-2xl mx-auto space-y-8">
-          {/* Profile Header */}
+    <div className="flex-1 p-6 lg:p-8 overflow-y-auto bg-background">
+      <div className="max-w-2xl mx-auto space-y-6">
+        {/* Profile Header */}
+        <div className="flex items-center gap-4 p-6 rounded-xl bg-card border border-border">
+          <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center text-base font-semibold text-primary border border-border">
+            {(user.email[0] || "U").toUpperCase()}
+          </div>
           <div>
-            <h1 className="text-4xl font-bold mb-2">Your Profile</h1>
-            <p className="text-muted-foreground">{user.email}</p>
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">User Profile</h1>
+            <p className="text-xs text-muted-foreground font-mono">{user.email}</p>
+          </div>
+        </div>
+
+        {/* Subscription Management */}
+        <Card className="bg-card border-border p-6 space-y-4 shadow-xs">
+          <div className="flex items-center gap-2 pb-3 border-b border-border">
+            <CreditCard className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground">Subscription Plan</h2>
           </div>
 
-          {/* Subscription Management */}
-          <Card className="bg-card border-border/50 p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <CreditCard className="w-5 h-5 text-primary" />
-              <h2 className="text-2xl font-semibold">Subscription</h2>
-            </div>
-
-            {isPro ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between py-4 border-b border-border/50">
-                  <div>
-                    <p className="font-medium">Current Plan</p>
-                    <p className="text-sm text-muted-foreground mt-1 flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-primary" />
-                      Pro Plan
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-muted-foreground">Status</p>
-                    <p className="text-sm font-medium text-green-500">Active</p>
-                  </div>
+          {isPro ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between py-2 border-b border-border">
+                <div>
+                  <p className="text-xs font-semibold text-foreground">Current Plan</p>
+                  <p className="text-xs text-primary mt-0.5 flex items-center gap-1.5 font-medium">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Pro Plan Active
+                  </p>
                 </div>
-
-                <AlertDialog open={showDowngradeDialog} onOpenChange={setShowDowngradeDialog}>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="text-muted-foreground" disabled={isDowngrading}>
-                      Downgrade to Free
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Downgrade to Free?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        You'll lose access to Pro features immediately. You can upgrade again anytime.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel disabled={isDowngrading}>Keep Pro</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={(e) => {
-                          e.preventDefault()
-                          handleDowngrade()
-                        }}
-                        disabled={isDowngrading}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
-                        {isDowngrading ? "Downgrading..." : "Confirm Downgrade"}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between py-4 border-b border-border/50">
-                  <div>
-                    <p className="font-medium">Current Plan</p>
-                    <p className="text-sm text-muted-foreground mt-1">Free</p>
-                  </div>
-                  <Link href="/upgrade">
-                    <Button variant="outline">Upgrade to Pro</Button>
-                  </Link>
+                <div className="text-right">
+                  <p className="text-[10px] text-muted-foreground uppercase font-semibold">Status</p>
+                  <p className="text-xs font-medium text-success">Active</p>
                 </div>
               </div>
-            )}
-          </Card>
 
-          {/* Account Actions */}
-          <Card className="bg-card border-border/50 p-8">
-            <h2 className="text-2xl font-semibold mb-6">Account Actions</h2>
-
-            <div className="space-y-3">
-              <Button
-                variant="outline"
-                className="w-full justify-start text-foreground bg-transparent"
-                onClick={handleLogout}
-                disabled={isLoggingOut}
-              >
-                <LogOut className="w-4 h-4 mr-3" />
-                {isLoggingOut ? "Signing out..." : "Sign Out"}
-              </Button>
-
-              <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+              <AlertDialog open={showDowngradeDialog} onOpenChange={setShowDowngradeDialog}>
                 <AlertDialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 bg-transparent"
-                    disabled={isDeleting}
-                  >
-                    <Trash2 className="w-4 h-4 mr-3" />
-                    Delete Account
+                  <Button variant="outline" size="sm" className="text-xs text-muted-foreground" disabled={isDowngrading}>
+                    Downgrade to Free
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Account?</AlertDialogTitle>
-                    <AlertDialogDescription className="space-y-2">
-                      <p>This action is permanent and cannot be undone.</p>
-                      <ul className="list-disc list-inside space-y-1 text-sm">
-                        <li>Your profile will be permanently deleted</li>
-                        <li>Your subscription data will be removed</li>
-                        <li>You won't be able to recover your account</li>
-                      </ul>
-                      <p className="font-semibold text-destructive pt-2">
-                        This action cannot be undone.
-                      </p>
+                    <AlertDialogTitle>Downgrade to Free?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      You will lose access to Pro features. You can upgrade again anytime.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isDeleting}>Keep Account</AlertDialogCancel>
+                    <AlertDialogCancel disabled={isDowngrading}>Keep Pro</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={(e) => {
                         e.preventDefault()
-                        handleDeleteAccount()
+                        handleDowngrade()
                       }}
-                      disabled={isDeleting}
+                      disabled={isDowngrading}
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     >
-                      {isDeleting ? "Deleting..." : "Delete Account"}
+                      {isDowngrading ? "Downgrading..." : "Confirm Downgrade"}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
             </div>
-          </Card>
-        </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between py-2 border-b border-border">
+                <div>
+                  <p className="text-xs font-semibold text-foreground">Current Plan</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Free Tier</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] text-muted-foreground uppercase font-semibold">Status</p>
+                  <p className="text-xs font-medium text-foreground">Active</p>
+                </div>
+              </div>
+              <div className="pt-2">
+                <Button size="sm" className="text-xs" asChild>
+                  <a href="/upgrade">Upgrade to Pro</a>
+                </Button>
+              </div>
+            </div>
+          )}
+        </Card>
+
+        {/* Security & Danger Zone */}
+        <Card className="bg-card border-border p-6 space-y-4 shadow-xs">
+          <div className="flex items-center gap-2 pb-3 border-b border-border">
+            <Shield className="w-4 h-4 text-muted-foreground" />
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground">Account Actions</h2>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 pt-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="text-xs gap-1.5"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              {isLoggingOut ? "Signing out..." : "Sign Out"}
+            </Button>
+
+            <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="sm" className="text-xs text-destructive hover:bg-destructive/10 gap-1.5" disabled={isDeleting}>
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Delete Account
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Account?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action is permanent and will delete all your meeting recordings and data.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleDeleteAccount()
+                    }}
+                    disabled={isDeleting}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {isDeleting ? "Deleting..." : "Delete Permanently"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </Card>
       </div>
     </div>
   )

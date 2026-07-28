@@ -14,7 +14,6 @@ export function ExportDropdown({ result }: ExportDropdownProps) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
-  // Close on outside click
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
@@ -176,32 +175,32 @@ ${result.transcript.map(l => `**${l.speaker}** *(${formatTimestamp(l.timestamp)}
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-[var(--text2)] hover:text-[var(--text)] hover:bg-[var(--bg3)] transition-colors border border-[var(--border)]"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium text-foreground hover:bg-muted transition-colors border border-border bg-card cursor-pointer shadow-xs"
         aria-label="Export meeting notes"
       >
-        <Download className="w-4 h-4" />
+        <Download className="w-3.5 h-3.5 text-muted-foreground" />
         <span className="hidden sm:inline">Export</span>
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-52 rounded-xl bg-[var(--card)] border border-[var(--border2)] shadow-xl shadow-black/30 z-50 overflow-hidden">
-          <div className="flex items-center justify-between px-3 py-2 border-b border-[var(--border)]">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text3)]">Export</span>
-            <button onClick={() => setOpen(false)} className="text-[var(--text3)] hover:text-[var(--text)]">
-              <X className="w-3.5 h-3.5" />
+        <div className="absolute right-0 top-full mt-1.5 w-48 rounded-lg bg-card border border-border shadow-lg z-50 overflow-hidden py-1">
+          <div className="flex items-center justify-between px-3 py-1.5 border-b border-border">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Export Options</span>
+            <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
+              <X className="w-3 h-3" />
             </button>
           </div>
           {ITEMS.map((item, i) => {
             if ('divider' in item) {
-              return <div key={i} className="border-t border-[var(--border)] my-1" />
+              return <div key={i} className="border-t border-border my-1" />
             }
             return (
               <button
                 key={i}
                 onClick={item.action}
-                className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-[var(--text2)] hover:text-[var(--text)] hover:bg-[var(--bg3)] transition-colors"
+                className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-foreground hover:bg-muted transition-colors text-left cursor-pointer"
               >
-                <item.icon className="w-4 h-4 text-[var(--text3)]" />
+                <item.icon className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
                 {item.label}
               </button>
             )

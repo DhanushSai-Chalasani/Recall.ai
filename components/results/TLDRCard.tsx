@@ -1,6 +1,6 @@
 "use client"
 
-import { Copy, Share2, Download } from "lucide-react"
+import { Copy, Download } from "lucide-react"
 import { toast } from "sonner"
 import type { MeetingResult } from "@/lib/types"
 
@@ -30,7 +30,7 @@ export function TLDRCard({ result }: TLDRCardProps) {
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
-      toast.success("Summary downloaded successfully as TXT file!")
+      toast.success("Summary downloaded as TXT!")
     } catch (err) {
       console.error("Failed to download summary:", err)
       toast.error("Failed to download summary")
@@ -38,21 +38,21 @@ export function TLDRCard({ result }: TLDRCardProps) {
   }
 
   return (
-    <div className="glass-panel p-6 rounded-2xl shadow-xl space-y-4">
-      <div className="flex items-center justify-between pb-3 border-b border-white/5">
-        <h3 className="text-sm font-extrabold text-white uppercase tracking-wider">Session Executive Summary</h3>
-        <div className="flex gap-1.5">
+    <div className="bg-card border border-border p-5 rounded-xl shadow-xs space-y-4">
+      <div className="flex items-center justify-between pb-2.5 border-b border-border">
+        <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">Executive Summary</h3>
+        <div className="flex gap-1">
           <button
             onClick={handleDownload}
-            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-all cursor-pointer shadow-sm"
-            aria-label="Download summary as TXT"
-            title="Download summary as TXT"
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+            aria-label="Download summary"
+            title="Download TXT"
           >
             <Download className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={handleCopy}
-            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-all cursor-pointer shadow-sm"
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
             aria-label="Copy summary"
             title="Copy summary"
           >
@@ -61,15 +61,15 @@ export function TLDRCard({ result }: TLDRCardProps) {
         </div>
       </div>
 
-      <p className="text-sm text-[var(--text2)] leading-relaxed font-semibold">
+      <p className="text-xs text-foreground leading-relaxed font-normal">
         {result.tldr}
       </p>
 
       {/* Key quote highlight */}
       {result.keyQuote && (
-        <blockquote className="border-l-2 border-pink-500 pl-4 py-3.5 bg-pink-500/5 rounded-r-xl glow-pink">
-          <p className="text-xs uppercase font-extrabold tracking-widest text-pink-400 mb-1">Key Insight / Decision</p>
-          <p className="text-sm italic text-zinc-200 font-semibold leading-relaxed">
+        <blockquote className="border-l-2 border-primary pl-3.5 py-2.5 bg-primary/5 rounded-r-md">
+          <p className="text-[10px] uppercase font-semibold tracking-wider text-primary mb-0.5">Key Insight</p>
+          <p className="text-xs italic text-foreground leading-relaxed">
             &ldquo;{result.keyQuote}&rdquo;
           </p>
         </blockquote>

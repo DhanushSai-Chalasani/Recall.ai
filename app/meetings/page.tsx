@@ -8,10 +8,10 @@ import { formatMinSec } from "@/lib/utils"
 import { toast } from "sonner"
 
 const SENTIMENT_ICONS: Record<string, { icon: React.ElementType; color: string }> = {
-  aligned:   { icon: Smile, color: 'var(--green)' },
-  tense:     { icon: Frown, color: 'var(--red)' },
-  uncertain: { icon: HelpCircle, color: 'var(--amber)' },
-  neutral:   { icon: Smile, color: 'var(--text3)' },
+  aligned:   { icon: Smile, color: 'var(--success)' },
+  tense:     { icon: Frown, color: 'var(--destructive)' },
+  uncertain: { icon: HelpCircle, color: 'var(--warning)' },
+  neutral:   { icon: Smile, color: 'var(--muted-foreground)' },
 }
 
 export default function MeetingsPage() {
@@ -120,35 +120,33 @@ export default function MeetingsPage() {
     })
 
   return (
-    <div className="flex-1 p-6 lg:p-10 overflow-y-auto bg-gradient-to-b from-[#05050c] to-[#0a0a16] selection:bg-purple-500/30">
+    <div className="flex-1 p-6 lg:p-8 overflow-y-auto bg-background">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">
+          <h1 className="text-xl font-semibold tracking-tight text-foreground mb-1">
             Meeting Vault
           </h1>
-          <p className="text-xs text-[var(--text2)] font-semibold">
-            {meetings.length} recordings cached inside Vector RAG database
+          <p className="text-xs text-muted-foreground">
+            {meetings.length} recordings stored in semantic index
           </p>
         </div>
       </div>
 
       {/* Search + Vault Ask bar */}
-      <div className="flex flex-col gap-4 mb-8 p-6 rounded-2xl glass-panel relative overflow-hidden shadow-xl glow-purple">
-        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500" />
-        
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 mb-6 p-5 rounded-xl bg-card border border-border shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
-            <h2 className="text-xs font-extrabold text-white uppercase tracking-wider">Vault AI Semantic Search</h2>
+            <Sparkles className="w-4 h-4 text-primary" />
+            <h2 className="text-xs font-semibold text-foreground uppercase tracking-wider">Semantic Vault Search</h2>
           </div>
 
           {/* Sentiment filter pills */}
-          <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-black/30 border border-white/5">
+          <div className="flex flex-wrap items-center gap-1 p-1 rounded-lg bg-muted border border-border">
             <button
               onClick={() => setFilterSentiment(null)}
-              className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                !filterSentiment ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"
+              className={`px-2.5 py-1 rounded text-[10px] font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+                !filterSentiment ? "bg-card text-foreground font-bold shadow-xs" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               All
@@ -157,8 +155,8 @@ export default function MeetingsPage() {
               <button
                 key={s}
                 onClick={() => setFilterSentiment(filterSentiment === s ? null : s)}
-                className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all capitalize cursor-pointer ${
-                  filterSentiment === s ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"
+                className={`px-2.5 py-1 rounded text-[10px] font-semibold uppercase tracking-wider transition-all capitalize cursor-pointer ${
+                  filterSentiment === s ? "bg-card text-foreground font-bold shadow-xs" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {s}
@@ -168,25 +166,25 @@ export default function MeetingsPage() {
         </div>
 
         <div className="flex gap-2">
-          <div className="flex-1 flex items-center gap-3 px-4 py-3 rounded-xl bg-black/40 border border-white/5 focus-within:border-purple-500/40 focus-within:ring-1 focus-within:ring-purple-500/30 transition-all">
-            <Search className="w-4.5 h-4.5 text-zinc-500" />
+          <div className="flex-1 flex items-center gap-2.5 px-3 py-2 rounded-md bg-background border border-border focus-within:border-primary transition-all">
+            <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             <input
               type="text"
-              placeholder="Query transcripts using Vector RAG, or ask: 'What did we decide about budget?'..."
+              placeholder="Search by title, topic, or ask: 'What did we decide about budget?'..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value)
-                if (aiResponse) setAiResponse(null) // clear response if typing
+                if (aiResponse) setAiResponse(null)
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && search.endsWith('?')) handleVaultAsk()
               }}
-              className="flex-1 bg-transparent text-sm text-[var(--text)] placeholder:text-[var(--text3)] outline-none font-semibold"
+              className="flex-1 bg-transparent text-xs text-foreground placeholder:text-muted-foreground outline-none font-medium"
             />
             {search.endsWith('?') && (
               <button 
                 onClick={handleVaultAsk}
-                className="flex items-center justify-center p-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:opacity-90 transition-all shadow-md"
+                className="flex items-center justify-center p-1.5 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-all cursor-pointer"
                 title="Ask Vault AI"
               >
                 <Send className="w-3.5 h-3.5" />
@@ -202,19 +200,16 @@ export default function MeetingsPage() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/20 shadow-inner"
+              className="p-3.5 rounded-md bg-primary/5 border border-primary/20"
             >
               {isAsking ? (
-                <div className="flex items-center gap-2.5 text-xs font-bold text-purple-400 uppercase tracking-widest">
-                  <div className="w-4 h-4 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
-                  Searching your meeting vault...
+                <div className="flex items-center gap-2 text-xs font-semibold text-primary uppercase tracking-wider">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  Searching meeting vault...
                 </div>
               ) : (
-                <p className="text-sm text-[var(--text2)] leading-relaxed">
-                  <span className="font-extrabold text-purple-400">Vault AI: </span>
-                {/* SAFETY INVARIANT: aiResponse is rendered as a React text node via {} interpolation,
-                    which auto-escapes all HTML/JS. Do NOT replace with dangerouslySetInnerHTML or an
-                    unsanitized markdown renderer without first adding rehype-sanitize or equivalent. */}
+                <p className="text-xs text-foreground leading-relaxed">
+                  <span className="font-semibold text-primary">Vault AI: </span>
                   {aiResponse}
                 </p>
               )}
@@ -224,10 +219,10 @@ export default function MeetingsPage() {
       </div>
 
       {/* Meeting list */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {isLoading ? (
-          <div className="text-center py-20 text-sm text-[var(--text3)] flex items-center justify-center gap-2">
-            <Loader2 className="w-4 h-4 text-purple-400 animate-spin" /> Loading your meetings...
+          <div className="text-center py-16 text-xs text-muted-foreground flex items-center justify-center gap-2">
+            <Loader2 className="w-4 h-4 text-primary animate-spin" /> Loading meetings...
           </div>
         ) : meetings.map((meeting, i) => {
           const sentiment = SENTIMENT_ICONS[meeting.insights?.sentiment] || SENTIMENT_ICONS.neutral
@@ -236,77 +231,77 @@ export default function MeetingsPage() {
           return (
             <motion.div
               key={meeting.id}
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06 }}
+              transition={{ delay: i * 0.04 }}
               className="relative group"
             >
               <Link
                 href={`/meetings/${meeting.id}`}
-                className="block p-6 rounded-2xl glass-panel glass-panel-hover pr-28 group"
+                className="block p-5 rounded-xl bg-card border border-border hover:border-primary/40 hover:shadow-xs transition-all pr-24 group"
               >
                 <div className="flex items-start justify-between gap-4">
                   {/* Left: name + meta */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2.5 mb-2">
-                      <h3 className="text-base font-extrabold text-white truncate group-hover:text-purple-400 transition-colors">
+                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                      <h3 className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">
                         {meeting.name}
                       </h3>
-                      <sentiment.icon className="w-4.5 h-4.5 flex-shrink-0" style={{ color: sentiment.color }} />
+                      <sentiment.icon className="w-4 h-4 flex-shrink-0" style={{ color: sentiment.color }} />
                       {meeting.insights?.meetingType && (
-                        <span className="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold text-white bg-gradient-to-r from-purple-600 to-pink-500 border border-white/10 shadow-sm shadow-purple-500/10">
-                          ✨ {meeting.insights.meetingType}
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground border border-border">
+                          {meeting.insights.meetingType}
                         </span>
                       )}
                     </div>
 
-                    <p className="text-xs text-[var(--text2)] line-clamp-2 mb-4 leading-relaxed font-semibold">
+                    <p className="text-xs text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
                       {meeting.tldr}
                     </p>
 
                     {/* Stats */}
                     {meeting.stats && (
-                    <div className="flex flex-wrap items-center gap-4 text-[10px] text-zinc-500 font-bold uppercase tracking-wider">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-purple-400" />
-                        {formatMinSec(meeting.stats.duration ?? 0)}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5 text-pink-400" />
-                        {meeting.stats.speakerCount ?? 1} speakers
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <FileText className="w-3.5 h-3.5 text-cyan-400" />
-                        {(meeting.stats.wordCount ?? 0).toLocaleString()} words
-                      </span>
-                    </div>
+                      <div className="flex flex-wrap items-center gap-4 text-[11px] text-muted-foreground font-medium">
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5" />
+                          {formatMinSec(meeting.stats.duration ?? 0)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Users className="w-3.5 h-3.5" />
+                          {meeting.stats.speakerCount ?? 1} speakers
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <FileText className="w-3.5 h-3.5" />
+                          {(meeting.stats.wordCount ?? 0).toLocaleString()} words
+                        </span>
+                      </div>
                     )}
                   </div>
 
                   {/* Right: date + arrow */}
-                  <div className="flex flex-col items-end gap-3 flex-shrink-0">
-                    <span className="text-[10px] text-zinc-500 font-bold font-mono">
+                  <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                    <span className="text-[11px] text-muted-foreground font-mono">
                       {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </span>
-                    <ChevronRight className="w-4 h-4 text-zinc-500 group-hover:text-purple-400 transition-colors" />
+                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
                   </div>
                 </div>
 
                 {/* Action items preview */}
                 {meeting.actionItems && meeting.actionItems.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-white/5">
-                    <div className="flex items-center gap-2 flex-wrap">
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       {meeting.actionItems.slice(0, 3).map((item: any) => (
                         <span
                           key={item.id}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 text-[9px] text-[var(--text2)] font-bold"
+                          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-muted text-[10px] text-foreground font-medium border border-border"
                         >
-                          <span className={`w-1.5 h-1.5 rounded-full ${item.done ? 'bg-[var(--green)] glow-green' : 'bg-[var(--amber)] glow-amber'}`} />
-                          <span className="truncate max-w-[130px]">{item.text}</span>
+                          <span className={`w-1.5 h-1.5 rounded-full ${item.done ? 'bg-success' : 'bg-warning'}`} />
+                          <span className="truncate max-w-[140px]">{item.text}</span>
                         </span>
                       ))}
                       {meeting.actionItems.length > 3 && (
-                        <span className="text-[10px] text-[var(--text3)] font-bold">
+                        <span className="text-[10px] text-muted-foreground font-medium">
                           +{meeting.actionItems.length - 3} more
                         </span>
                       )}
@@ -315,21 +310,21 @@ export default function MeetingsPage() {
                 )}
               </Link>
 
-              {/* Floating action buttons */}
-              <div className="absolute right-6 top-6 flex flex-col gap-2">
+              {/* Action buttons on hover */}
+              <div className="absolute right-4 top-4 flex flex-col gap-1.5">
                 <button
                   onClick={(e) => handleQuickArchive(meeting.id, e)}
-                  className="p-2 rounded-xl border border-white/5 bg-black/40 text-zinc-500 hover:text-purple-400 hover:border-purple-500/20 hover:bg-purple-500/10 opacity-0 group-hover:opacity-100 transition-all z-10 cursor-pointer shadow-md"
+                  className="p-1.5 rounded-md border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted opacity-0 group-hover:opacity-100 transition-all z-10 cursor-pointer shadow-xs"
                   title="Archive meeting"
                 >
-                  <Archive className="w-4 h-4" />
+                  <Archive className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={(e) => handleDelete(meeting.id, e)}
-                  className="p-2 rounded-xl border border-white/5 bg-black/40 text-zinc-500 hover:text-red-400 hover:border-red-500/20 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all z-10 cursor-pointer shadow-md"
+                  className="p-1.5 rounded-md border border-border bg-card text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-all z-10 cursor-pointer shadow-xs"
                   title="Delete meeting"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             </motion.div>
@@ -337,8 +332,8 @@ export default function MeetingsPage() {
         })}
 
         {!isLoading && meetings.length === 0 && (
-          <div className="text-center py-20 border border-dashed border-white/5 rounded-2xl bg-black/20">
-            <p className="text-sm text-[var(--text3)] font-semibold">No recordings found inside this vault directory.</p>
+          <div className="text-center py-16 border border-dashed border-border rounded-xl bg-card">
+            <p className="text-xs text-muted-foreground font-medium">No meetings found in your vault.</p>
           </div>
         )}
       </div>

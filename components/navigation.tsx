@@ -17,37 +17,46 @@ export function Navigation() {
   return (
     <>
       {/* Mobile Navigation */}
-      <nav className="md:hidden border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full">
-        <div className="container mx-auto px-6 py-5">
+      <nav className="md:hidden border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-50 w-full">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <Link
               href="/"
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
-              <div className="w-8 h-8 rounded-lg bg-[var(--accent)] flex items-center justify-center">
-                <Mic className="w-5 h-5 text-white" />
+              <div className="w-7 h-7 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs">
+                <Mic className="w-4 h-4" />
               </div>
-              <span className="font-bold text-lg" style={{ fontFamily: "var(--font-serif)" }}>Recall.ai</span>
+              <span className="font-semibold text-base tracking-tight text-foreground">
+                Recall<span className="text-primary font-normal">.ai</span>
+              </span>
             </Link>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2"
+              className="p-1.5 rounded-md text-muted-foreground hover:text-foreground"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="border-t border-border/50 px-6 py-4 space-y-4">
+          <div className="border-t border-border px-4 py-3 space-y-3 bg-card">
             {!isLoading && (
               <>
                 {user ? (
                   <>
                     <Link
+                      href="/dashboard"
+                      className="block text-sm font-medium text-foreground py-1.5"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
                       href="/profile"
-                      className="block py-2"
+                      className="block text-sm font-medium text-foreground py-1.5"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Profile
@@ -57,7 +66,7 @@ export function Navigation() {
                         href="/upgrade"
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        <Button className="w-full">Upgrade to Pro</Button>
+                        <Button className="w-full mt-2" size="sm">Upgrade to Pro</Button>
                       </Link>
                     )}
                   </>
@@ -65,7 +74,7 @@ export function Navigation() {
                   <>
                     <Link
                       href="/upgrade"
-                      className="block py-2"
+                      className="block text-sm font-medium text-foreground py-1.5"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Pricing
@@ -74,7 +83,7 @@ export function Navigation() {
                       href="/auth/login"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <Button className="w-full">Sign In</Button>
+                      <Button className="w-full mt-2" size="sm">Sign In</Button>
                     </Link>
                   </>
                 )}
@@ -85,51 +94,60 @@ export function Navigation() {
       </nav>
 
       {/* Desktop Navigation */}
-      <nav className="hidden md:block border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-5">
+      <nav className="hidden md:block border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-3.5">
           <div className="flex items-center justify-between">
             <Link
               href="/"
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
-              <div className="w-8 h-8 rounded-lg bg-[var(--accent)] flex items-center justify-center">
-                <Mic className="w-5 h-5 text-white" />
+              <div className="w-7 h-7 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs">
+                <Mic className="w-4 h-4" />
               </div>
-              <span className="font-bold text-xl" style={{ fontFamily: "var(--font-serif)" }}>Recall.ai</span>
+              <span className="font-semibold text-lg tracking-tight text-foreground">
+                Recall<span className="text-primary font-normal">.ai</span>
+              </span>
             </Link>
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
               {!isLoading && (
                 <>
                   {user ? (
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
+                      <Link href="/dashboard">
+                        <Button size="sm" variant="ghost" className="text-xs font-medium">
+                          Dashboard
+                        </Button>
+                      </Link>
                       <Link
                         href="/profile"
-                        className={`transition-colors ${
-                          pathname === "/profile" ? "text-primary" : "text-foreground/80 hover:text-foreground"
+                        className={`p-1.5 rounded-md transition-colors ${
+                          pathname === "/profile" ? "text-primary bg-accent" : "text-muted-foreground hover:text-foreground"
                         }`}
                         title="Profile"
                       >
-                        <User className="w-5 h-5" />
+                        <User className="w-4 h-4" />
                       </Link>
                       {!isPro && (
                         <Link href="/upgrade">
-                          <Button variant="outline" size="sm" className="text-sm bg-transparent">
+                          <Button variant="outline" size="sm" className="text-xs">
                             Upgrade
                           </Button>
                         </Link>
                       )}
                     </div>
                   ) : (
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2.5">
                       <Link href="/upgrade">
-                        <Button variant="ghost" size="sm" className="text-sm">
+                        <Button variant="ghost" size="sm" className="text-xs">
                           Pricing
                         </Button>
                       </Link>
-                      <Button size="sm" className="text-sm" asChild>
-                        <Link href="/auth/login">Sign In</Link>
-                      </Button>
+                      <Link href="/auth/login">
+                        <Button size="sm" className="text-xs">
+                          Sign In
+                        </Button>
+                      </Link>
                     </div>
                   )}
                 </>

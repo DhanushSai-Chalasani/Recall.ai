@@ -6,16 +6,14 @@ export function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="border-t border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 mt-auto">
-      <div className="container mx-auto px-6 py-8">
+    <footer className="border-t border-border bg-card mt-auto">
+      <div className="container mx-auto px-6 py-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          {/* Copyright */}
-          <div className="text-sm text-muted-foreground">
+          <div className="text-xs text-muted-foreground">
             © {currentYear} Recall.ai. All rights reserved.
           </div>
 
-          {/* Links */}
-          <div className="flex items-center gap-6 text-sm">
+          <div className="flex items-center gap-4 text-xs">
             <Link
               href="/privacy"
               className="text-muted-foreground hover:text-foreground transition-colors"

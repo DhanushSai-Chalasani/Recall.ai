@@ -31,7 +31,7 @@ export function WaveformCanvas({ isRecording, stream }: WaveformCanvasProps) {
   }, [])
 
   return (
-    <div className="w-full h-[80px] rounded-xl bg-[var(--bg)]/50 border border-[var(--border)] overflow-hidden">
+    <div className="w-full h-[72px] rounded-md bg-background border border-border overflow-hidden">
       <canvas
         ref={canvasRef}
         role="img"

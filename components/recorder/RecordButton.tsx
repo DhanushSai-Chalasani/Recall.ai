@@ -19,9 +19,9 @@ export function RecordButton({ phase, onStart, onStop }: RecordButtonProps) {
       {/* Outer pulse ring (recording only) */}
       {isRecording && (
         <motion.div
-          animate={{ scale: [1, 1.4], opacity: [0.6, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-          className="absolute inset-[-16px] rounded-full border border-[var(--red)]"
+          animate={{ scale: [1, 1.3], opacity: [0.5, 0] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
+          className="absolute inset-[-12px] rounded-full border border-destructive"
         />
       )}
 
@@ -30,22 +30,22 @@ export function RecordButton({ phase, onStart, onStop }: RecordButtonProps) {
         disabled={isProcessing}
         aria-label={isRecording ? "Stop recording" : isProcessing ? "Processing audio" : "Start recording"}
         className={`
-          relative w-16 h-16 rounded-full flex items-center justify-center
-          transition-all duration-300 shadow-lg cursor-pointer
+          relative w-14 h-14 rounded-full flex items-center justify-center
+          transition-all duration-200 shadow-md cursor-pointer
           ${isRecording
-            ? "bg-[var(--red)] hover:bg-[var(--red)]/90 ring-4 ring-[var(--red)]/20"
+            ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
             : isProcessing
-            ? "bg-[var(--card2)] cursor-not-allowed"
-            : "bg-[var(--accent)] hover:bg-[var(--accent)]/90 ring-4 ring-[var(--accent)]/20 hover:ring-[var(--accent)]/40"
+            ? "bg-muted text-muted-foreground cursor-not-allowed"
+            : "bg-primary text-primary-foreground hover:bg-primary/90"
           }
         `}
       >
         {isProcessing ? (
-          <Loader2 className="w-6 h-6 text-white animate-spin" />
+          <Loader2 className="w-5 h-5 animate-spin" />
         ) : isRecording ? (
-          <Square className="w-5 h-5 text-white" />
+          <Square className="w-4 h-4 fill-current" />
         ) : (
-          <Mic className="w-6 h-6 text-white" />
+          <Mic className="w-5 h-5" />
         )}
       </button>
     </div>

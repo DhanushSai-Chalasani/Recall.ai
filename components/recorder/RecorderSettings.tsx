@@ -14,8 +14,8 @@ export function RecorderSettings({ settings, onChange }: RecorderSettingsProps) 
 
   return (
     <div className="space-y-3">
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text3)]">
-        AI Settings
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        AI Strategy
       </p>
       <div className="grid grid-cols-2 gap-2">
         {/* Speaker Diarize */}
@@ -24,8 +24,8 @@ export function RecorderSettings({ settings, onChange }: RecorderSettingsProps) 
           className={`
             p-3 rounded-lg border text-left transition-all text-xs
             ${settings.diarize
-              ? "bg-[var(--accent)]/5 border-[var(--accent)]/20 text-[var(--accent)]"
-              : "bg-[var(--bg)] border-[var(--border)] text-[var(--text3)]"
+              ? "bg-primary/10 border-primary/30 text-primary"
+              : "bg-background border-border text-muted-foreground"
             }
           `}
         >
@@ -39,8 +39,8 @@ export function RecorderSettings({ settings, onChange }: RecorderSettingsProps) 
           className={`
             p-3 rounded-lg border text-left transition-all text-xs
             ${settings.actions
-              ? "bg-[var(--accent)]/5 border-[var(--accent)]/20 text-[var(--accent)]"
-              : "bg-[var(--bg)] border-[var(--border)] text-[var(--text3)]"
+              ? "bg-primary/10 border-primary/30 text-primary"
+              : "bg-background border-border text-muted-foreground"
             }
           `}
         >
@@ -49,32 +49,32 @@ export function RecorderSettings({ settings, onChange }: RecorderSettingsProps) 
         </button>
 
         {/* Language */}
-        <div className="p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)]">
-          <p className="font-semibold text-xs text-[var(--text2)] mb-1">Language</p>
+        <div className="p-3 rounded-lg border border-border bg-background">
+          <p className="font-semibold text-xs text-muted-foreground mb-1">Language</p>
           <select
             value={settings.language}
             onChange={(e) => update('language', e.target.value)}
-            className="w-full bg-transparent text-xs text-[var(--text)] focus:outline-none cursor-pointer"
+            className="w-full bg-transparent text-xs text-foreground focus:outline-none cursor-pointer"
           >
-            <option value="en" className="bg-[var(--card)] text-[var(--text)]">English</option>
-            <option value="hi" className="bg-[var(--card)] text-[var(--text)]">Hindi</option>
-            <option value="es" className="bg-[var(--card)] text-[var(--text)]">Spanish</option>
-            <option value="fr" className="bg-[var(--card)] text-[var(--text)]">French</option>
-            <option value="auto" className="bg-[var(--card)] text-[var(--text)]">Auto-detect</option>
+            <option value="en" className="bg-card text-foreground">English</option>
+            <option value="hi" className="bg-card text-foreground">Hindi</option>
+            <option value="es" className="bg-card text-foreground">Spanish</option>
+            <option value="fr" className="bg-card text-foreground">French</option>
+            <option value="auto" className="bg-card text-foreground">Auto-detect</option>
           </select>
         </div>
 
         {/* Summary Style */}
-        <div className="p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)]">
-          <p className="font-semibold text-xs text-[var(--text2)] mb-1">Style</p>
+        <div className="p-3 rounded-lg border border-border bg-background">
+          <p className="font-semibold text-xs text-muted-foreground mb-1">Style</p>
           <select
             value={settings.style}
             onChange={(e) => update('style', e.target.value)}
-            className="w-full bg-transparent text-xs text-[var(--text)] focus:outline-none cursor-pointer"
+            className="w-full bg-transparent text-xs text-foreground focus:outline-none cursor-pointer"
           >
-            <option value="detailed" className="bg-[var(--card)] text-[var(--text)]">Detailed</option>
-            <option value="brief" className="bg-[var(--card)] text-[var(--text)]">Brief</option>
-            <option value="bullet" className="bg-[var(--card)] text-[var(--text)]">Bullet</option>
+            <option value="detailed" className="bg-card text-foreground">Detailed</option>
+            <option value="brief" className="bg-card text-foreground">Brief</option>
+            <option value="bullet" className="bg-card text-foreground">Bullet</option>
           </select>
         </div>
       </div>

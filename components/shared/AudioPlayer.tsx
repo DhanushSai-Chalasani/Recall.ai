@@ -19,7 +19,6 @@ export function AudioPlayer({ audioUrl, onSeek }: AudioPlayerProps) {
   const [muted, setMuted] = useState(false)
   const [playbackRate, setPlaybackRate] = useState(1)
 
-  // Create audio element
   useEffect(() => {
     if (!audioUrl) return
     const audio = new Audio(audioUrl)
@@ -29,7 +28,6 @@ export function AudioPlayer({ audioUrl, onSeek }: AudioPlayerProps) {
     audio.addEventListener("timeupdate", () => setCurrentTime(audio.currentTime))
     audio.addEventListener("ended", () => setIsPlaying(false))
 
-    // Listen for custom seek events from anywhere in the app
     const handleSeekEvent = (e: Event) => {
       const customEvent = e as CustomEvent<number>
       if (typeof customEvent.detail === 'number') {
@@ -103,67 +101,59 @@ export function AudioPlayer({ audioUrl, onSeek }: AudioPlayerProps) {
   if (!audioUrl) return null
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-xl bg-[var(--card)] border border-[var(--border)]">
-      {/* Play/Pause */}
+    <div className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border shadow-xs">
       <button
         onClick={togglePlay}
-        className="w-8 h-8 rounded-full bg-[var(--accent)] flex items-center justify-center hover:bg-[var(--accent)]/90 transition-colors flex-shrink-0"
+        className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors flex-shrink-0 cursor-pointer"
         aria-label={isPlaying ? "Pause" : "Play"}
       >
         {isPlaying ? (
-          <Pause className="w-3.5 h-3.5 text-white" />
+          <Pause className="w-3.5 h-3.5 fill-current" />
         ) : (
-          <Play className="w-3.5 h-3.5 text-white ml-0.5" />
+          <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
         )}
       </button>
 
-      {/* Time */}
-      <span className="text-xs font-mono text-[var(--text3)] min-w-[40px]" style={{ fontFamily: 'var(--font-mono)' }}>
+      <span className="text-xs font-mono text-muted-foreground min-w-[36px]">
         {formatMinSec(Math.floor(currentTime))}
       </span>
 
-      {/* Progress bar */}
       <div
         ref={progressRef}
         onClick={handleProgressClick}
-        className="flex-1 h-1.5 rounded-full bg-[var(--bg3)] cursor-pointer group relative"
+        className="flex-1 h-1.5 rounded-full bg-muted cursor-pointer group relative"
       >
         <div
-          className="h-full rounded-full bg-[var(--accent)] transition-all relative"
+          className="h-full rounded-full bg-primary relative"
           style={{ width: `${progress}%` }}
         >
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow-md opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
       </div>
 
-      {/* Duration */}
-      <span className="text-xs font-mono text-[var(--text3)] min-w-[40px]" style={{ fontFamily: 'var(--font-mono)' }}>
+      <span className="text-xs font-mono text-muted-foreground min-w-[36px]">
         {formatMinSec(Math.floor(duration))}
       </span>
 
-      {/* Speed */}
       <button
         onClick={cycleSpeed}
-        className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-[var(--bg3)] text-[var(--text2)] hover:text-[var(--text)] transition-colors"
-        style={{ fontFamily: 'var(--font-mono)' }}
-        aria-label="Change playback speed"
+        className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        aria-label="Playback speed"
       >
         {playbackRate}×
       </button>
 
-      {/* Mute */}
       <button
         onClick={toggleMute}
-        className="text-[var(--text3)] hover:text-[var(--text)] transition-colors"
+        className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         aria-label={muted ? "Unmute" : "Mute"}
       >
         {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
       </button>
 
-      {/* Restart */}
       <button
         onClick={restart}
-        className="text-[var(--text3)] hover:text-[var(--text)] transition-colors"
+        className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         aria-label="Restart"
       >
         <RotateCcw className="w-3.5 h-3.5" />

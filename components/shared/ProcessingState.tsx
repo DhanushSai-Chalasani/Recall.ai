@@ -13,37 +13,34 @@ export function ProcessingState({ steps }: ProcessingStateProps) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex-1 flex flex-col items-center justify-center p-12"
+      className="flex-1 flex flex-col items-center justify-center p-12 h-full"
     >
       <div className="w-full max-w-sm space-y-4">
-        <h3
-          className="text-lg font-semibold text-[var(--text)] text-center mb-6"
-          style={{ fontFamily: 'var(--font-serif)' }}
-        >
-          Processing your meeting…
+        <h3 className="text-base font-semibold text-foreground text-center mb-5">
+          Processing meeting capture…
         </h3>
 
         {steps.map((step, i) => (
           <motion.div
             key={step.name}
-            initial={{ opacity: 0, x: -10 }}
+            initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="flex items-center gap-3"
+            transition={{ delay: i * 0.08 }}
+            className="flex items-center gap-2.5"
           >
             {step.state === 'done' ? (
-              <CheckCircle2 className="w-5 h-5 text-[var(--green)] flex-shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" />
             ) : step.state === 'active' ? (
-              <Loader2 className="w-5 h-5 text-[var(--accent)] animate-spin flex-shrink-0" />
+              <Loader2 className="w-4 h-4 text-primary animate-spin flex-shrink-0" />
             ) : (
-              <Circle className="w-5 h-5 text-[var(--text3)] flex-shrink-0" />
+              <Circle className="w-4 h-4 text-muted-foreground/40 flex-shrink-0" />
             )}
-            <span className={`text-sm ${
+            <span className={`text-xs ${
               step.state === 'done'
-                ? "text-[var(--text2)] line-through"
+                ? "text-muted-foreground line-through"
                 : step.state === 'active'
-                ? "text-[var(--text)] font-medium"
-                : "text-[var(--text3)]"
+                ? "text-foreground font-medium"
+                : "text-muted-foreground"
             }`}>
               {step.label}
             </span>

@@ -30,7 +30,6 @@ export default function SignUpPage() {
     }
   }, [])
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (!authLoading && user) {
       router.push(returnUrl || "/dashboard")
@@ -55,7 +54,6 @@ export default function SignUpPage() {
     }
 
     try {
-      // If we are using the placeholder local URL, skip actual fetch to avoid CORS/DNS exception
       const isPlaceholder = process.env.NEXT_PUBLIC_SUPABASE_URL?.includes("placeholder-url-please-replace")
       
       if (isPlaceholder) {
@@ -74,16 +72,12 @@ export default function SignUpPage() {
       })
       if (error) throw error
 
-      // If the user is immediately logged in (email confirmation disabled),
-      // redirect them directly to the dashboard.
       if (data.session) {
         router.push(returnUrl || "/dashboard")
       } else {
-        // Email confirmation is required — show the success screen.
         setEmailSent(true)
       }
     } catch (err: any) {
-      // Fallback for fetch/network errors (perfect for running local demo without a database)
       if (err instanceof Error && (err.message.includes("failed to fetch") || err.message.includes("Failed to fetch") || err.message.includes("NetworkError"))) {
         console.warn("[SignUp] Supabase connection failed. Falling back to offline mock session.", err)
         document.cookie = "sb-mock-session=true; path=/; max-age=86400"
@@ -98,81 +92,74 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden selection:bg-purple-500/30">
-      {/* Ambient background glows */}
-      <div className="absolute top-[30%] left-[20%] w-[350px] h-[350px] bg-purple-600/10 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-pink-500/10 blur-[130px] rounded-full pointer-events-none" />
-
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
       {/* Logo */}
-      <Link href="/" className="flex items-center gap-2.5 mb-8 group relative z-10">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/25 group-hover:scale-105 transition-transform">
-          <Mic className="w-5 h-5 text-white" />
+      <Link href="/" className="flex items-center gap-2 mb-6 group relative z-10">
+        <div className="w-8 h-8 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs">
+          <Mic className="w-4 h-4" />
         </div>
-        <span className="text-2xl font-bold tracking-tight text-[var(--text)] font-sans">
-          Recall<span className="text-purple-400">.ai</span>
+        <span className="text-xl font-semibold tracking-tight text-foreground">
+          Recall<span className="text-primary font-normal">.ai</span>
         </span>
       </Link>
 
-      <div className="w-full max-w-md relative z-10 glass-panel p-8 rounded-2xl glow-purple">
+      <div className="w-full max-w-sm relative z-10 bg-card border border-border p-6 rounded-xl shadow-xs">
         <AnimatePresence mode="wait">
           {emailSent ? (
-            /* ── Email sent success screen ───────────── */
             <motion.div
               key="success"
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              className="text-center space-y-6"
+              exit={{ opacity: 0, y: -12 }}
+              className="text-center space-y-4"
             >
               <div className="flex justify-center">
-                <div className="w-20 h-20 rounded-full bg-[var(--green)]/10 border border-[var(--green)]/20 flex items-center justify-center">
-                  <Mail className="w-9 h-9 text-[var(--green)]" />
+                <div className="w-14 h-14 rounded-full bg-success/10 border border-success/20 flex items-center justify-center">
+                  <Mail className="w-6 h-6 text-success" />
                 </div>
               </div>
               <div>
-                <h1 className="text-2xl font-extrabold text-[var(--text)] mb-2">
+                <h1 className="text-xl font-semibold text-foreground mb-1">
                   Check your inbox
                 </h1>
-                <p className="text-sm text-[var(--text2)] leading-relaxed">
+                <p className="text-xs text-muted-foreground leading-relaxed">
                   We&apos;ve sent a confirmation link to{" "}
-                  <span className="font-semibold text-[var(--text)]">{email}</span>.
-                  Click it to activate your account.
+                  <span className="font-semibold text-foreground">{email}</span>.
                 </p>
               </div>
-              <div className="p-4 rounded-xl bg-purple-500/5 border border-white/5 text-left space-y-2.5">
-                {["Check your spam folder if you don't see the email.", "The link expires after 24 hours.", "Once confirmed, you'll be taken to your dashboard."].map((tip) => (
+              <div className="p-3 rounded-lg bg-muted text-left space-y-2">
+                {["Check your spam folder if needed.", "The link expires after 24 hours.", "Once confirmed, log in to continue."].map((tip) => (
                   <div key={tip} className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-[var(--text2)]">{tip}</p>
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />
+                    <p className="text-[11px] text-muted-foreground">{tip}</p>
                   </div>
                 ))}
               </div>
               <Link
                 href="/auth/login"
-                className="inline-flex items-center gap-1.5 text-sm text-purple-400 hover:text-purple-300 font-semibold"
+                className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-semibold"
               >
-                Back to Sign In <ArrowRight className="w-3.5 h-3.5" />
+                Back to Sign In <ArrowRight className="w-3 h-3" />
               </Link>
             </motion.div>
           ) : (
-            /* ── Signup form ─────────────────────────── */
             <motion.div
               key="form"
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              className="space-y-6"
+              exit={{ opacity: 0, y: -12 }}
+              className="space-y-5"
             >
               <div className="text-center">
-                <h1 className="text-2xl font-extrabold tracking-tight text-[var(--text)]">
+                <h1 className="text-xl font-semibold tracking-tight text-foreground">
                   Create Account
                 </h1>
-                <p className="mt-2 text-sm text-[var(--text2)]">Start capturing meetings in seconds</p>
+                <p className="mt-1 text-xs text-muted-foreground">Start capturing meetings in seconds</p>
               </div>
 
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="email" className="text-[var(--text2)] text-xs font-semibold uppercase tracking-wider">Email</Label>
+              <form onSubmit={handleSignUp} className="space-y-3.5">
+                <div className="space-y-1">
+                  <Label htmlFor="email" className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">Email</Label>
                   <Input
                     id="email"
                     type="email"
@@ -180,11 +167,11 @@ export default function SignUpPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-black/30 border-white/5 text-[var(--text)] placeholder:text-[var(--text3)] focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/35 h-11 rounded-xl transition-all"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-primary h-10 rounded-md text-xs"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="password" className="text-[var(--text2)] text-xs font-semibold uppercase tracking-wider">Password</Label>
+                <div className="space-y-1">
+                  <Label htmlFor="password" className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">Password</Label>
                   <Input
                     id="password"
                     type="password"
@@ -192,19 +179,19 @@ export default function SignUpPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="At least 6 characters"
-                    className="bg-black/30 border-white/5 text-[var(--text)] placeholder:text-[var(--text3)] focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/35 h-11 rounded-xl transition-all"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-primary h-10 rounded-md text-xs"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="repeat-password" className="text-[var(--text2)] text-xs font-semibold uppercase tracking-wider">Confirm Password</Label>
+                <div className="space-y-1">
+                  <Label htmlFor="repeat-password" className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">Confirm Password</Label>
                   <Input
                     id="repeat-password"
                     type="password"
                     required
                     value={repeatPassword}
                     onChange={(e) => setRepeatPassword(e.target.value)}
-                    placeholder="Repeat your password"
-                    className="bg-black/30 border-white/5 text-[var(--text)] placeholder:text-[var(--text3)] focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/35 h-11 rounded-xl transition-all"
+                    placeholder="Repeat password"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-primary h-10 rounded-md text-xs"
                   />
                 </div>
 
@@ -214,7 +201,7 @@ export default function SignUpPage() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="rounded-xl bg-[var(--red)]/10 border border-[var(--red)]/20 px-3 py-3 text-xs font-medium text-[var(--red)]"
+                      className="rounded-md bg-destructive/10 border border-destructive/20 px-3 py-2 text-xs font-medium text-destructive"
                     >
                       {error}
                     </motion.div>
@@ -223,18 +210,18 @@ export default function SignUpPage() {
 
                 <Button
                   type="submit"
-                  className="w-full py-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold rounded-xl shadow-lg shadow-purple-500/20 transition-all border border-purple-500/20"
+                  className="w-full h-10 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold rounded-md text-xs transition-colors"
                   disabled={isLoading}
                 >
                   {isLoading ? "Creating account…" : "Create Account"}
                 </Button>
               </form>
 
-              <p className="text-center text-sm text-[var(--text3)]">
+              <p className="text-center text-xs text-muted-foreground">
                 Already have an account?{" "}
                 <Link
                   href={returnUrl ? `/auth/login?returnUrl=${encodeURIComponent(returnUrl)}` : "/auth/login"}
-                  className="text-purple-400 hover:text-purple-300 hover:underline font-semibold"
+                  className="text-primary hover:underline font-semibold"
                 >
                   Sign in
                 </Link>

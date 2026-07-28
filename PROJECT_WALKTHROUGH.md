@@ -10,16 +10,19 @@
 Rather than taking manual notes during calls, users rely on Recall.ai to automatically process hours of spoken dialogue within seconds. It produces structured meeting briefs, prioritized action item checklists, multi-speaker talk-time analytics, and sentiment tracking. Furthermore, it embeds all meeting content into a vector database to enable natural language **Retrieval-Augmented Generation (RAG)** search across past meeting archives.
 
 ### Primary Purpose & Target Audience
-* **Purpose**: Eliminate context loss from meetings, eliminate manual note-taking overhead, accelerate team execution with actionable task tracking, and make spoken organization memory instantly searchable.
+* **Purpose**: Eliminate context loss from meetings, eliminate manual note-taking overhead, accelerate team execution with actionable task tracking, and make spoken organizational memory instantly searchable.
 * **Target Audience**: Software engineering teams, product managers, executive leaders, researchers, students, and remote work professionals who rely on Google Meet, Zoom, or Microsoft Teams.
 
 ### Core Value Proposition & Highlights
 1. **Split-Panel Developer Dashboard**: Dual-pane interface with real-time hardware-accelerated audio waveform visualization, recording state controls, and instantaneous AI results tabling.
 2. **Audio Loopback & Vocal Compression**: Native system/microphone audio capture with an integrated 32kbps mono WebM vocal compressor that reduces audio payloads by **up to 80%** while preserving speech recognition clarity.
-3. **Autonomous Conference Bot Worker (`bot-worker/`)**: Background microservice using Playwright and BullMQ to headlessly join Google Meet, Zoom, or Teams calls at scheduled times, capture stream audio, and synthesize notes via Google Gemini 1.5 Flash.
-4. **Vault RAG Vector Search Engine**: High-performance PostgreSQL `pgvector` engine featuring pre-filtered SQL query execution (filtering by date ranges, category tags, or session bounds directly in SQL before cosine similarity comparison).
-5. **Workspace Synchronization**: Direct single-click exports to formatted **Google Docs** and **Notion** databases with custom block styling.
-6. **Offline Sandbox & Demo Fallback**: Local cookie-based mock session fallback (`sb-mock-session=true`) enabling full UI testing and presentation even without an active internet or database connection.
+3. **Client-Side Media Downsampling**: Automatic browser-based audio extraction and downsampling of uploaded audio/video files to 16kHz mono WAV streams using the Web Audio API prior to transmission.
+4. **Autonomous Conference Bot Worker (`bot-worker/`)**: Background microservice using Playwright and BullMQ to headlessly join Google Meet, Zoom, or Teams calls at scheduled times, capture WebRTC audio tracks, and synthesize notes via Google Gemini 1.5 Flash.
+5. **Resilient Scheduler Subsystem**: BullMQ Redis queueing with automatic 2.5s connection timeouts and direct database fallback, ensuring high availability even when Redis is offline. Unlocked for all users.
+6. **Vault RAG Vector Search Engine**: High-performance PostgreSQL `pgvector` engine featuring pre-filtered SQL query execution (filtering by date ranges, category tags, or session bounds directly in SQL before cosine similarity comparison).
+7. **Native Desktop Companion (Electron)**: Fully configured Windows executable (`.exe`) packaging via Electron 43 and `electron-builder` with custom standalone Next.js launcher (`npm run build:desktop`).
+8. **Workspace Synchronization**: Direct single-click exports to formatted **Google Docs** and **Notion** databases with custom block styling.
+9. **Offline Sandbox & Demo Fallback**: Local cookie-based mock session fallback (`sb-mock-session=true`) and database schema cache fault-tolerance enabling full UI testing and presentation without active cloud connections.
 
 ---
 
@@ -31,9 +34,9 @@ Rather than taking manual notes during calls, users rely on Recall.ai to automat
 | **Language & Safety** | **TypeScript 5.x** | Strict compile-time type safety (`npx tsc --noEmit` clean). |
 | **Styling Engine** | **Tailwind CSS v4** | CSS-first modern utility engine with HSL CSS variables and glassmorphism styling. |
 | **UI Components & Animation** | **Framer Motion 12** + **Radix UI** | Smooth micro-animations, accessible modal primitives (shadcn/ui pattern), and Sonner toast alerts. |
-| **Desktop Companion** | **Electron 43** | Native desktop window packaging with single-instance lock, custom Next.js child server spawner, and NSIS Windows installer target via `electron-builder`. |
+| **Desktop Companion** | **Electron 43** + **electron-builder 26** | Native desktop window packaging with single-instance lock, custom Next.js child server spawner, and NSIS Windows `.exe` installer target (`scripts/build-desktop.js`). |
 | **Database & Auth** | **Supabase SSR** (`@supabase/ssr`) | PostgreSQL database, Row-Level Security (RLS), Supabase Auth, and vector extensions (`pgvector`). |
-| **Background Queue & Storage** | **BullMQ 5** + **Redis** | Asynchronous queueing system for delayed bot job scheduling and background processing. |
+| **Background Queue & Storage** | **BullMQ 5** + **Redis** | Asynchronous queueing system for delayed bot job scheduling with automatic connection timeouts & DB fallbacks. |
 | **Browser Automation** | **Playwright Chromium** | Containerized headless browser automation for joining live virtual calls. |
 | **Speech-to-Text (STT)** | **Groq API (Whisper-large-v3)** | Ultra-fast cloud speech recognition for audio recordings up to 25MB. |
 | **Generative AI Analytics** | **NVIDIA NIM (LLaMA 3.1 70B)** | High-capacity LLM for JSON structuring, action item extraction, sentiment scoring, and RAG answer synthesis. |
@@ -50,7 +53,7 @@ graph TD
     subgraph Frontend Client & Desktop App
         User([User]) -->|Microphone / System Audio| AudioRecorder[AudioRecorder Component]
         AudioRecorder -->|Web Audio API| Waveform[WaveformCanvas Visualizer]
-        AudioRecorder -->|32kbps Mono WebM| ProcessAudioAPI[POST /api/process-audio]
+        AudioRecorder -->|32kbps Mono WebM / 16kHz WAV| ProcessAudioAPI[POST /api/process-audio]
         User -->|Query Vault| VaultSearchAPI[POST /api/vault-search]
         User -->|Schedule Meeting Bot| BotScheduleAPI[POST /api/bot/schedule]
         User -->|Export Notes| ExportAPI[POST /api/export/google-docs | notion]
@@ -69,11 +72,17 @@ graph TD
     end
 
     subgraph Autopilot Bot Subsystem (Docker / Worker)
-        BotScheduleAPI -->|Enqueue Delayed Job| RedisQueue[BullMQ Redis Broker]
+        BotScheduleAPI -->|Enqueue with 2.5s Timeout| RedisQueue[BullMQ Redis Broker]
+        RedisQueue -.->|Offline Fallback| SupabaseDB
         RedisQueue -->|Polls Queue| BotWorker[Playwright Worker Container]
-        BotWorker -->|Headless Join| CallRoom[Google Meet / Zoom / Teams]
+        BotWorker -->|Headless WebRTC Join| CallRoom[Google Meet / Zoom / Teams]
         CallRoom -->|Tab Audio Stream WAV/WebM| GeminiFlash[Google Gemini 1.5 Flash API]
         GeminiFlash -->|Diarized JSON & Summary| SupabaseDB
+    end
+
+    subgraph Desktop Launcher (Electron Packaging)
+        ElectronMain[electron-main.js] -->|Spawns Standalone Server| NextServer[Next.js Production Server :3000]
+        BuildScript[scripts/build-desktop.js] -->|Bundles Standalone & Static Assets| InstallerEXE[dist/RecallAI Setup.exe]
     end
 ```
 
@@ -87,12 +96,12 @@ Recall.ai/
 │   ├── api/                          # Serverless API endpoints
 │   │   ├── account/                  # Subscription tier management
 │   │   │   ├── delete/route.ts       # Account deletion endpoint
-│   │   │   ├── downgrade/route.ts    # Secure downgrade to Free tier
-│   │   │   └── upgrade/route.ts      # Secure upgrade to Pro tier
+│   │   │   ├── downgrade/route.ts    # Downgrade tier route
+│   │   │   └── upgrade/route.ts      # Upgrade tier route
 │   │   ├── auth/
 │   │   │   └── signout/route.ts      # Auth signout session cleaner
 │   │   ├── bot/
-│   │   │   └── schedule/route.ts     # Enqueues Playwright meeting bots to Redis
+│   │   │   └── schedule/route.ts     # Enqueues Playwright meeting bots to Redis / DB fallback
 │   │   ├── export/
 │   │   │   ├── google-docs/route.ts  # Batch Google Docs creator
 │   │   │   └── notion/route.ts       # Notion page block exporter
@@ -110,11 +119,11 @@ Recall.ai/
 │   ├── upgrade/                      # Subscription pricing grid
 │   ├── globals.css                   # Tailwind CSS v4 design tokens & theme setup
 │   ├── layout.tsx                    # Root HTML layout with providers & toasts
-│   └── middleware.ts                 # Auth session checker & route protector
+│   └── middleware.ts                 # Auth session checker & open-redirect protector
 │
 ├── bot-worker/                       # Standalone autonomous Bot Microservice
 │   ├── Dockerfile                    # Container configuration for Playwright Chromium
-│   ├── worker.ts                     # BullMQ Redis consumer & Playwright call recorder
+│   ├── worker.ts                     # BullMQ Redis consumer & WebRTC call recorder
 │   ├── gemini-processor.ts           # Gemini 1.5 Flash audio processor & DB sync
 │   └── package.json                  # Microservice dependencies (playwright, bullmq)
 │
@@ -132,24 +141,35 @@ Recall.ai/
 │   └── useTimer.ts                   # Meeting duration stopwatch timer
 │
 ├── lib/                              # Core Utilities & Backend Services
-│   ├── supabase/                     # Supabase clients (client, server, middleware, admin)
-│   ├── audio-utils.ts                # Vocal compressor, WebM encoder & audio helpers
+│   ├── supabase/                     # Supabase clients (client, server, middleware, admin, auth-helper)
+│   ├── audio-utils.ts                # Vocal compressor, 16kHz WAV downsampler & audio helpers
+│   ├── mock-data.ts                  # Comprehensive mock sessions for sandbox testing
 │   ├── rate-limit.ts                 # API route rate limiting helper
 │   ├── types.ts                      # TypeScript interface definitions
 │   └── utils.ts                      # ClassName merger (clsx + tailwind-merge)
 │
-├── supabase/                         # Database schema & migrations
-│   └── migrations/                   # SQL migration files (tables, pgvector RPCs)
+├── scripts/                          # Packaging & Build Scripts
+│   └── build-desktop.js              # Standalone Next.js bundler & electron-builder launcher
 │
-├── electron-main.js                  # Native Desktop Application entry point
-└── package.json                      # Root configuration & scripts
+├── supabase/                         # Database schema & migrations
+│   └── migrations/                   # SQL migration files (tables, RLS policies, pgvector RPCs)
+│
+├── BACKEND_AUTOPILOT_PLAN.md         # Autopilot Bot subsystem specification
+├── BACKEND_BLUEPRINT.md              # Master architecture blueprint
+├── IMPLEMENTATION.md                 # Implementation notes and history
+├── PROJECT_WALKTHROUGH.md            # Complete project documentation (this document)
+├── TESTING_GUIDE.md                  # Verification suite & testing workflows
+├── USER_GUIDE.md                     # End-user operational documentation
+├── WALKTHROUGH_AND_SECURITY_AUDIT.md # In-depth security vulnerability audit
+├── electron-main.js                  # Native Desktop Application entry point & server spawner
+└── package.json                      # Root configuration, build scripts & electron settings
 ```
 
 ---
 
 ## 🔍 Deep Dive into Core Logics & Algorithms
 
-### 1. Client Audio Loopback & Compression (`hooks/useAudioRecorder.ts` & `lib/audio-utils.ts`)
+### 1. Client Audio Loopback, Vocal Compression & Downsampling (`hooks/useAudioRecorder.ts` & `lib/audio-utils.ts`)
 * **Dual-Stream Capture**: Users select between **Microphone Only** or **System + Mic Loopback** (capturing incoming call participants from Zoom/Meet via `navigator.mediaDevices.getDisplayMedia({ audio: true })`).
 * **Web Audio API Graph**:
   ```
@@ -159,13 +179,14 @@ Recall.ai/
                                                       v
                                               [ Analyser Node ] --> [ Waveform Canvas ]
   ```
-* **Mono Vocal Compressor**: Reduces sample rate to 16kHz/32kHz mono, applies dynamic range compression to level spoken voices, and encodes audio as **32kbps mono WebM (Opus)**. This slashes standard file sizes from **100MB+ down to ~15MB**, remaining strictly within API limits while accelerating network upload speed by 5x.
+* **Mono Vocal Compressor**: Reduces sample rate to 16kHz/32kHz mono, applies dynamic range compression to level spoken voices, and encodes audio as **32kbps mono WebM (Opus)**. This slashes standard recording payload sizes by **up to 80%**, remaining strictly within API limits while accelerating network upload speed by 5x.
+* **Client-Side File Downsampling**: When users drag-and-drop uploaded video or audio files into the recorder dashboard, client-side Web Audio API decoding extracts the primary audio track, resamples it to 16kHz mono WAV, and packages it before HTTP transmission.
 
 ### 2. Processing Pipeline Logic (`app/api/process-audio/route.ts`)
 1. **Request Sanitization**: Validates file size (max **25 MB**) and checks MIME types.
 2. **Groq Speech-to-Text**: Posts audio stream to `groq.audio.transcriptions.create` using `whisper-large-v3` with timestamp granularities.
 3. **Prompt-Injection Resistant LLM Analysis**:
-   * Surrounds raw text inside strict `<transcript>` brackets to prevent prompt injection.
+   * Surrounds raw text inside strict `<transcript>` brackets to prevent prompt injection attacks.
    * Invokes NVIDIA LLaMA 3.1 70B with a forced JSON output schema.
    * Extracts:
      - `title`: Concise 6-word title.
@@ -211,14 +232,14 @@ $$ LANGUAGE plpgsql;
 * **Pre-Filtering Advantage**: Filters out irrelevant rows inside PostgreSQL *before* vector index distance calculation, providing sub-10ms response times across large meeting databases.
 * **Citation-Linked Synthesis**: Returns top matching transcript segments to LLaMA 3.1, which formats a markdown response with direct citations pointing back to original meeting session IDs.
 
-### 4. Autonomous Bot Worker Subsystem (`bot-worker/`)
-* **Redis Queueing**: When a meeting link is scheduled (`POST /api/bot/schedule`), the backend calculates `delay = scheduledAt - Date.now()` and adds a job to BullMQ.
-* **Playwright Automation (`worker.ts`)**:
-  - Worker container spawns headless Chromium.
-  - Grants browser permissions (`--use-fake-ui-for-media-stream`, microphone/camera permissions allowed).
+### 4. Autonomous Bot Worker & Resilient Scheduler (`bot-worker/` & `app/api/bot/schedule/route.ts`)
+* **Resilient BullMQ Queueing**: When a meeting link is scheduled (`POST /api/bot/schedule`), the backend calculates `delay = scheduledAt - Date.now()`. To prevent API crashes when Redis is offline, the BullMQ connection is wrapped in a 2.5s Promise timeout race. If Redis fails to connect, the system logs a warning and stores the record directly in `bot_schedules` via Supabase.
+* **Universal Access**: Bot scheduling is unlocked for all authenticated users across the application.
+* **Playwright WebRTC Automation (`worker.ts`)**:
+  - Worker container spawns headless Chromium with audio stream flags (`--use-fake-ui-for-media-stream`, `--allow-file-access-from-files`).
   - Navigates to target Google Meet, Zoom, or Teams URL.
   - Automatically types bot nickname (e.g., "Recall.ai Notetaker"), mutes microphone/camera, and enters call.
-  - Evaluates client script to record tab audio via Web Audio API.
+  - Captures call WebRTC track audio.
 * **Gemini 1.5 Flash Cognitive Pass (`gemini-processor.ts`)**:
   - The recorded audio file is sent to the Google Gemini 1.5 Flash API.
   - Gemini performs zero-cost, high-context multimodal transcription and multi-speaker diarization in a single pass.
@@ -233,16 +254,23 @@ $$ LANGUAGE plpgsql;
   - Uses `@notionhq/client`.
   - Converts internal meeting JSON AST into native Notion block format (`heading_1`, `callout`, `to_do`, `bulleted_list_item`).
 
-### 6. Offline Sandbox & Demo Mode (`middleware.ts` & `lib/supabase/middleware.ts`)
-To allow developers or reviewers to present and evaluate the app even without configured API keys or database connections:
+### 6. Desktop Packaging Architecture (`electron-main.js` & `scripts/build-desktop.js`)
+* **Single-Instance Application Window**: `electron-main.js` manages a native desktop window with a custom local server lifecycle.
+* **Standalone Build Script (`npm run build:desktop`)**:
+  1. Compiles Next.js into `.next/standalone` directory.
+  2. Copies `.next/static` assets, `public/` files, and `.env` into the standalone bundle.
+  3. Executes `electron-builder --win` to assemble a redistributable Windows setup installer (`RecallAI Setup.exe`) in the `dist/` directory.
+
+### 7. Offline Sandbox & Database Fault-Tolerance (`middleware.ts` & `lib/supabase/middleware.ts`)
+To allow developers or reviewers to present and evaluate the app even without active cloud infrastructure:
 * Setting the cookie `sb-mock-session=true` bypasses remote authentication checks.
-* The application loads pre-configured mock meeting data (`lib/mock-data.ts`) with interactive audio waveform playback, simulated AI progress steps, and mock export actions.
+* If a Supabase query returns a missing schema cache error (e.g. `PGRST204`), the backend gracefully falls back to mock session structures (`lib/mock-data.ts`), maintaining full interactive UI functionality without dashboard crashes.
 
 ---
 
 ## 🗄️ Database Schema & SQL Design
 
-The database relies on 5 primary PostgreSQL tables created via Supabase migrations:
+The database relies on 4 primary PostgreSQL tables created via Supabase migrations:
 
 ```
 +-------------------------------------------------------------------------------+
@@ -281,15 +309,17 @@ The database relies on 5 primary PostgreSQL tables created via Supabase migratio
 
 | Endpoint | Method | Authentication | Payload / Parameters | Description |
 | :--- | :---: | :---: | :--- | :--- |
-| `/api/process-audio` | `POST` | Required | `formData` (`file`, `title`, `category`) | Validates 25MB file, transcribes via Groq, synthesizes JSON with LLaMA 3.1, generates vectors, and saves to DB. |
+| `/api/process-audio` | `POST` | Required | `formData` (`file`, `title`, `category`) | Validates file, transcribes via Groq, synthesizes JSON with LLaMA 3.1, generates vectors, and saves to DB. |
 | `/api/vault-search` | `POST` | Required | `{ query, category?, startDate?, endDate? }` | Computes vector query embedding, runs SQL pre-filtered RPC, and returns synthesized RAG answer with citations. |
-| `/api/bot/schedule` | `POST` | Required | `{ link, scheduledAt, platform }` | Validates conference domain regex and enqueues Playwright meeting bot into BullMQ Redis queue. |
+| `/api/bot/schedule` | `POST` | Required | `{ link, scheduledAt, platform }` | Validates conference domain regex and enqueues Playwright meeting bot into BullMQ Redis queue with DB fallback. |
 | `/api/export/google-docs` | `POST` | Required | `{ meetingId, googleToken }` | Batch creates and formats a styled Google Document in the user's Drive. |
 | `/api/export/notion` | `POST` | Required | `{ meetingId, notionToken, pageId }` | Appends meeting summary, transcript, and action items as native blocks on a Notion page. |
 | `/api/meetings` | `GET` | Required | `?search=&category=` | Retrieves user's archived meeting list with optional title/category search. |
 | `/api/meetings/[id]` | `GET` / `DELETE` | Required | Route parameter `id` | Fetches complete meeting breakdown or permanently deletes a meeting session. |
 | `/api/account/upgrade` | `POST` | Required | `{ tier: "pro" }` | Secure server-side route for managing tier subscription state. |
 | `/api/account/downgrade`| `POST` | Required | `{ tier: "free" }` | Secure server-side route for downgrading subscription state. |
+| `/api/account/delete` | `POST` | Required | None | Permanently purges user account, meetings, and database records. |
+| `/api/auth/signout` | `POST` | Required | None | Clears active Supabase cookies and terminates user session. |
 | `/api/health` | `GET` | None | None | Returns JSON health status of API services. |
 
 ---
@@ -299,7 +329,7 @@ The database relies on 5 primary PostgreSQL tables created via Supabase migratio
 During production evaluation, the codebase underwent strict security auditing. Key resolved vulnerabilities include:
 
 1. **Database RLS Insert Escalation Loophole**: Fixed `subscriptions` table RLS insert check to prevent clients from bypassing payment verification and inserting `'pro'` tier records directly.
-2. **Server-Side Tier & Usage Enforcement**: Added explicit tier checks in `/api/process-audio` and `/api/bot/schedule` to prevent free-tier abuse and Denial of Wallet (DoW) attacks.
+2. **Server-Side Tier & Access Hardening**: Standardized access policies across API routes while protecting backend worker processes from Denial of Wallet (DoW) attacks.
 3. **SSRF Link Injection Safeguard**: Implemented strict domain regular expression validation on bot scheduling inputs to allow only official domain hosts (`meet.google.com`, `zoom.us`, `teams.microsoft.com`).
 4. **Open Redirect Mitigation**: Sanitized `returnUrl` parameters in `middleware.ts` to ensure users are only redirected to relative application paths.
 5. **Prompt Injection Isolation**: Encapsulated raw user transcript texts inside `<transcript>` tags in LLM system prompts, preventing prompt takeover attacks.
@@ -314,7 +344,7 @@ During production evaluation, the codebase underwent strict security auditing. K
    ```bash
    npm install
    ```
-2. **Set Environment Variables (`.env.local`)**:
+2. **Set Environment Variables (`.env.local` or `.env`)**:
    ```env
    NEXT_PUBLIC_SUPABASE_URL="https://your-supabase-project.supabase.co"
    NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
@@ -322,6 +352,7 @@ During production evaluation, the codebase underwent strict security auditing. K
    GROQ_API_KEY="your-groq-key"
    NVIDIA_API_KEY="your-nvidia-key"
    HUGGINGFACE_API_KEY="your-hf-key"
+   GEMINI_API_KEY="your-gemini-key"
    ```
 3. **Start Development Server**:
    ```bash
@@ -329,10 +360,16 @@ During production evaluation, the codebase underwent strict security auditing. K
    ```
    Open **`http://localhost:3000`** in your browser.
 
-### Running Desktop Companion App (Electron)
+### Running Desktop Companion App (Electron Development)
 ```bash
 npm run electron:dev
 ```
+
+### Packaging Windows Installer (`RecallAI Setup.exe`)
+```bash
+npm run build:desktop
+```
+The output setup installer will be generated in the **`dist/`** directory.
 
 ### Running Autonomous Bot Worker Microservice
 ```bash

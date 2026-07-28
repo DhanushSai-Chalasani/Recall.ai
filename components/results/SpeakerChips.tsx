@@ -10,25 +10,25 @@ interface SpeakerChipsProps {
 
 export function SpeakerChips({ speakers }: SpeakerChipsProps) {
   return (
-    <div className="flex flex-wrap gap-2 mb-6">
+    <div className="flex flex-wrap gap-2 mb-5">
       {speakers.map((speaker, i) => {
         const color = getSpeakerColor(i)
         return (
           <motion.div
             key={speaker.id}
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.05 }}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--border)] bg-[var(--card)]"
+            transition={{ delay: i * 0.04 }}
+            className="flex items-center gap-2 px-2.5 py-1 rounded-full border border-border bg-card shadow-xs text-xs"
           >
             <div
-              className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+              className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
               style={{ backgroundColor: color }}
             >
               {getInitials(speaker.label)}
             </div>
-            <span className="text-xs font-medium text-[var(--text)]">{speaker.label}</span>
-            <span className="text-[10px] text-[var(--text3)] font-mono" style={{ fontFamily: 'var(--font-mono)' }}>
+            <span className="font-medium text-foreground">{speaker.label}</span>
+            <span className="text-[10px] text-muted-foreground font-mono">
               {formatMinSec(speaker.talkTime)}
             </span>
           </motion.div>
