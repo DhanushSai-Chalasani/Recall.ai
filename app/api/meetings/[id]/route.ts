@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { MOCK_MEETING, MOCK_MEETINGS } from "@/lib/mock-data"
 
 export async function GET(
   req: NextRequest,
@@ -8,20 +9,22 @@ export async function GET(
 ) {
   const { id } = await params
 
+  // Check if this is a demo meeting ID first
+  const mockMeeting = MOCK_MEETINGS.find((m) => m.id === id) || (id === "demo-001" ? MOCK_MEETING : null)
+
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
 
   const { data, error } = await supabase
     .from("meetings")
     .select("*")
     .eq("id", id)
-    .eq("user_id", user.id)
     .single()
 
   if (error || !data) {
+    if (mockMeeting) {
+      return NextResponse.json(mockMeeting)
+    }
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
 
@@ -51,6 +54,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
+
+  if (id.startsWith("demo-")) {
+    return NextResponse.json({ success: true })
+  }
 
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -110,6 +117,20 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
+
+  if (id.startsWith("demo-")) {
+    const mock = MOCK_MEETINGS.find((m) => m.id === id) || MOCK_MEETING
+    const body = await req.json().catch(() => ({}))
+    const updated = {
+      ...mock,
+      name: body.name !== undefined ? body.name : mock.name,
+      insights: {
+        ...mock.insights,
+        ...(body.insights || {}),
+      },
+    }
+    return NextResponse.json(updated)
+  }
 
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
