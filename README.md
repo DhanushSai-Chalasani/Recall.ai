@@ -76,9 +76,6 @@ Recall.ai has been rigorously audited and secured against modern web vulnerabili
       route.ts                ← Secure 25MB validation & AI analytics orchestrator
     /vault-search
       route.ts                ← Upgraded vector search endpoint with dynamic filtering
-    /bot
-      /schedule
-        route.ts              ← Active scheduler queue adding BullMQ delayed jobs
     /export
       /google-docs
         route.ts              ← Google Docs batch-styled note creator & Drive exporter
@@ -88,16 +85,9 @@ Recall.ai has been rigorously audited and secured against modern web vulnerabili
       /upgrade                ← Secure subscription/tier upgrader
       /downgrade              ← Secure tier downgrade router
 
-/bot-worker
-  /Dockerfile                 ← Containerized headless Chromium Playwright environment
-  /worker.ts                  ← Asynchronous BullMQ queue worker & browser recorder
-  /gemini-processor.ts        ← Gemini 1.5 Flash diarized transcript & Supabase persistent sync
-  /package.json               ← Standalone packages (playwright, bullmq, @google/genai)
-  /README.md                  ← Step-by-step OCI VM & Docker deployment guide
-
 /components
   /recorder
-    AudioRecorder.tsx         ← Recorder coordinator & modes
+    AudioRecorder.tsx         ← Recorder coordinator (Mic, File Upload, System Audio)
     WaveformCanvas.tsx        ← Frequency waveform visualizer
   /results
     ResultsPanel.tsx          ← Summary, Action Items, & Insights tab panel
@@ -123,22 +113,13 @@ Recall.ai has been rigorously audited and secured against modern web vulnerabili
 * **Local Auth Bypass (Demo Mode):** Added a secure, cookie-based local sandbox bypass (`sb-mock-session=true`) in Next.js `middleware.ts`, `auth-helper.ts`, and React context. If remote database connections fail or Supabase environment variables are missing, the server gracefully falls back to a mock demo session (`demo@recall.ai`), allowing developers to test and record client-side dashboards 100% offline.
 * **Database Query Fixes:** Resolved query schema discrepancies by selecting and mapping normalized SQL table fields (such as `duration`, `speakers`, and `action_items`) instead of querying non-existent fields, preventing server-side API crashes.
 
-### 🤖 Autonomous Conference Note-Taker Bot (`bot-worker/`)
-A production-ready, highly containerized background microservice designed for infinite VM execution (bypassing the Vercel 60-second limit entirely):
-* **Asynchronous Delayed Queueing:** The schedule API pushes BullMQ jobs with millisecond delay offsets calculated from target dates into a central Redis broker.
-* **Playwright Conference Joining:** Headless Chromium instances safely enter Google Meet, Microsoft Teams, or Zoom, programmatically bypassing lobbies, muting microphones, and disabling cameras.
-* **Lossless Audio Streaming:** Injects a custom Web Audio API stream recorder inside browser pages to capture call audio in high-fidelity WAV streams.
-* **Zero-Cost Multimodal Synthesis:** Feeds raw audio recordings directly to the **Google Gemini 1.5 Flash API**, transcribing and synthesizing diarized speaker timelines and action insights in a single multimodal pass.
-* **Automatic Cloud Database Sync:** Commits synthesized results directly back to the Supabase PostgreSQL database and uploads audio files to the `meetings-audio` bucket.
-
 ---
 
 ## 🚀 Quick Start Guide
 
 ### Prerequisites
 * [Node.js](https://nodejs.org/) v20+
-* [Supabase CLI](https://supabase.com/docs/guides/cli) & [Docker](https://www.docker.com/)
-* [Redis](https://redis.io/) (for active Autopilot queue scheduling)
+* [Supabase Account](https://supabase.com/) or Local Supabase CLI
 
 ### Setup Instructions
 
@@ -151,26 +132,15 @@ A production-ready, highly containerized background microservice designed for in
 
 2. **Configure Environment Keys (`.env.local`):**
    ```env
-   NEXT_PUBLIC_SUPABASE_URL="http://127.0.0.1:54321"
+   NEXT_PUBLIC_SUPABASE_URL="https://your-supabase-project.supabase.co"
    NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
    SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
    GROQ_API_KEY="your-groq-key-here"
    NVIDIA_API_KEY="your-nvidia-key-here"
-   REDIS_HOST="127.0.0.1"
-   REDIS_PORT="6379"
    ```
 
-3. **Configure and Run the Background Bot Worker:**
+3. **Launch Main Web Application Development Server:**
    ```bash
-   cd bot-worker
-   npm install
-   # Run locally:
-   npm start
-   ```
-
-4. **Launch Main Web Application Development Server:**
-   ```bash
-   cd ..
    npm run dev
    ```
    Open **[http://localhost:3000](http://localhost:3000)** in your browser, create an account, and start capturing meetings.
@@ -192,7 +162,6 @@ npm run dev          # Start Next.js development server
 npm run build        # Compile production-optimized code
 npx tsc --noEmit     # Verify strict TypeScript safety (Keep at zero errors!)
 npm run lint         # Run ESLint validation checks
-supabase studio      # Open local DB browser dashboard
 ```
 
 ---

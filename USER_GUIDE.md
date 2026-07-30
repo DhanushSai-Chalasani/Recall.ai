@@ -93,6 +93,7 @@ If you want to apply instant settings optimized for specific meeting types, choo
 * **Upload Mode (Pre-recorded Files):** Allows you to upload pre-recorded meetings or classes.
   * *Supported file formats:* `.mp3`, `.wav`, `.m4a`, `.webm`, `.mp4`.
   * *File size limit:* Strictly validated up to **25 MB** to ensure fast serverless execution.
+* **System Audio Mode (Browser Tab/Call Capture):** Captures native tab or system audio directly via browser screen share (`getDisplayMedia`) to record active Google Meet, Zoom, or Microsoft Teams calls without needing any extensions or bots.
 
 ### Step 4: Refine Processing Parameters
 Under **Recorder Settings**, toggles are available to fine-tune the AI execution context:
