@@ -66,4 +66,4 @@ export interface RecorderSettings {
   style: string       // "brief" | "detailed" | "bullet"
 }
 
-export type RecorderMode = 'mic' | 'upload' | 'system' | 'bot'
+export type RecorderMode = 'mic' | 'upload' | 'system'

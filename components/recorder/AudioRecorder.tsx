@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   Sparkles, Mic, Square, Loader2, Upload, Monitor,
-  Sliders, Globe, FileText, CheckCircle2, RotateCcw, VolumeX,
-  Bot, Calendar
+  Sliders, Globe, FileText, CheckCircle2, RotateCcw, VolumeX
 } from "lucide-react"
 import { toast } from "sonner"
 import { useAudioRecorder } from "@/hooks/useAudioRecorder"
@@ -36,70 +35,8 @@ export function AudioRecorder() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [isOptimizing, setIsOptimizing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-
-  // Autopilot Bot scheduling states
-  const [botLink, setBotLink] = useState("")
-  const [botTime, setBotTime] = useState("")
-  const [botName, setBotName] = useState("Recall Note Taker")
-  const [detectedPlatform, setDetectedPlatform] = useState<string | null>(null)
-  const [isScheduling, setIsScheduling] = useState(false)
-
-  async function handleScheduleBot() {
-    if (!botLink || !botTime) return
-    setIsScheduling(true)
-    try {
-      const response = await fetch("/api/bot/schedule", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          link: botLink,
-          scheduledAt: botTime,
-          botName: botName || "Recall Note Taker",
-          settings: {
-            diarize: settings.diarize,
-            actions: settings.actions,
-            language: settings.language,
-            style: settings.style,
-          }
-        })
-      })
-
-      if (response.ok) {
-        toast.success("Autopilot scheduled!", { description: `Bot will join at ${new Date(botTime).toLocaleString()}` })
-        setBotLink("")
-        setBotTime("")
-        setBotName("Recall Note Taker")
-        setDetectedPlatform(null)
-      } else {
-        const errorData = await response.json().catch(() => ({}))
-        if (response.status === 404) {
-          toast.success("Autopilot Scheduled (Demo Mode)", { 
-            description: `Scheduled bot for: ${new Date(botTime).toLocaleString()}` 
-          })
-          setBotLink("")
-          setBotTime("")
-          setBotName("Recall Note Taker")
-          setDetectedPlatform(null)
-        } else {
-          toast.error("Failed to schedule bot", { description: errorData.error || "Please check details and try again." })
-        }
-      }
-    } catch (err) {
-      console.error(err)
-      toast.success("Autopilot Scheduled (Demo Mode)", { 
-        description: `Scheduled bot for: ${new Date(botTime).toLocaleString()}` 
-      })
-      setBotLink("")
-      setBotTime("")
-      setBotName("Recall Note Taker")
-      setDetectedPlatform(null)
-    } finally {
-      setIsScheduling(false)
-    }
-  }
   
   async function handleStart() {
-    if (mode === "bot") return
     await startMic(mode as "mic" | "system" | "upload")
     startTimer()
     setPhase("recording")
@@ -397,12 +334,11 @@ export function AudioRecorder() {
             <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-0.5">
               Capture Source
             </p>
-            <div className="grid grid-cols-2 p-1 rounded-lg bg-muted border border-border gap-1">
+            <div className="grid grid-cols-3 p-1 rounded-lg bg-muted border border-border gap-1">
               {[
                 { id: 'mic' as const, icon: Mic, label: 'Microphone' },
                 { id: 'upload' as const, icon: Upload, label: 'File Upload' },
                 { id: 'system' as const, icon: Monitor, label: 'System Audio' },
-                { id: 'bot' as const, icon: Bot, label: 'Autopilot Bot' },
               ].map(m => (
                 <button
                   key={m.id}
@@ -452,90 +388,6 @@ export function AudioRecorder() {
             <p className="text-xs text-foreground leading-relaxed">
               <strong className="font-semibold">System Audio Note:</strong> Ensure you enable &quot;Share audio&quot; in the browser prompt when selecting the target tab or screen.
             </p>
-          </div>
-        )}
-
-        {/* Autopilot Bot Panel */}
-        {phase === "idle" && mode === 'bot' && (
-          <div className="space-y-3">
-            <div className="p-4 rounded-xl border border-border bg-card shadow-xs space-y-3.5">
-              <div className="flex items-center gap-2 pb-2 border-b border-border">
-                <Bot className="w-4 h-4 text-primary" />
-                <div>
-                  <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">Autopilot Scheduler</h3>
-                  <p className="text-[10px] text-muted-foreground">Send a virtual agent to record the meeting</p>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-medium text-muted-foreground">
-                    Meeting Link (Google Meet, Zoom, Teams)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="https://meet.google.com/abc-defg-hij"
-                    value={botLink}
-                    onChange={(e) => {
-                      setBotLink(e.target.value);
-                      if (e.target.value.includes("meet.google.com")) setDetectedPlatform("google-meet");
-                      else if (e.target.value.includes("zoom.us")) setDetectedPlatform("zoom");
-                      else if (e.target.value.includes("teams.microsoft")) setDetectedPlatform("teams");
-                      else setDetectedPlatform(null);
-                    }}
-                    className="w-full px-3 py-2 rounded-md bg-background border border-border text-xs text-foreground outline-none focus:border-primary transition-all"
-                  />
-                  {detectedPlatform && (
-                    <span className="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary border border-primary/20">
-                      {detectedPlatform === "google-meet" ? "Google Meet" : detectedPlatform === "zoom" ? "Zoom" : "MS Teams"} Detected
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[10px] font-medium text-muted-foreground">
-                    Start Date & Time
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={botTime}
-                    onChange={(e) => setBotTime(e.target.value)}
-                    className="w-full px-3 py-2 rounded-md bg-background border border-border text-xs text-foreground outline-none focus:border-primary transition-all"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[10px] font-medium text-muted-foreground">
-                    Bot Display Name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Recall Note Taker"
-                    value={botName}
-                    onChange={(e) => setBotName(e.target.value)}
-                    className="w-full px-3 py-2 rounded-md bg-background border border-border text-xs text-foreground outline-none focus:border-primary transition-all"
-                  />
-                </div>
-              </div>
-
-              <button
-                onClick={handleScheduleBot}
-                disabled={isScheduling || !botLink || !botTime}
-                className="w-full mt-1 py-2.5 px-4 rounded-md bg-primary text-primary-foreground text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 transition-all hover:bg-primary/90 cursor-pointer disabled:opacity-50"
-              >
-                {isScheduling ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    Scheduling...
-                  </>
-                ) : (
-                  <>
-                    <Calendar className="w-3.5 h-3.5" />
-                    Schedule Autopilot
-                  </>
-                )}
-              </button>
-            </div>
           </div>
         )}
 
@@ -634,7 +486,7 @@ export function AudioRecorder() {
         )}
 
         {/* Record Control Dial */}
-        {mode !== 'upload' && mode !== 'bot' && (phase === "idle" || phase === "recording") && (
+        {mode !== 'upload' && (phase === "idle" || phase === "recording") && (
           <div className="relative flex items-center justify-center py-2">
             <button
               onClick={isRecording ? handleStop : handleStart}

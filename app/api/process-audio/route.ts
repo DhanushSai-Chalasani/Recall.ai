@@ -162,16 +162,31 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid file type. Only audio and video files (up to 25MB) are allowed." }, { status: 400 });
     }
 
+    // Check API Key Configuration
+    if (!process.env.GROQ_API_KEY || !process.env.NVIDIA_API_KEY) {
+      return NextResponse.json(
+        { error: "API keys for Groq or NVIDIA are not configured on server.", code: "MISSING_API_KEYS" },
+        { status: 402 }
+      );
+    }
 
     // =========================================================================
     // PHASE 1: TRANSCRIPTION (Groq Whisper)
     // =========================================================================
-    const transcription = await groq.audio.transcriptions.create({
-      file,
-      model: "whisper-large-v3",
-      response_format: "verbose_json",
-      language: languageSetting !== "auto" ? languageSetting : undefined,
-    });
+    let transcription;
+    try {
+      transcription = await groq.audio.transcriptions.create({
+        file,
+        model: "whisper-large-v3",
+        response_format: "verbose_json",
+        language: languageSetting !== "auto" ? languageSetting : undefined,
+      });
+    } catch (groqErr: any) {
+      console.error("Groq Whisper Transcription Error:", groqErr);
+      return NextResponse.json({
+        error: groqErr?.message || "Failed to transcribe audio with Groq Whisper. Please check your GROQ_API_KEY."
+      }, { status: 502 });
+    }
     
     // Map verbose_json output to transcript format
     const segments = (transcription as any).segments || [];
@@ -183,8 +198,8 @@ export async function POST(req: NextRequest) {
         }))
       : [{ speaker: "Speaker", timestamp: 0, text: transcription.text }];
 
-    const fullText = transcription.text;
-    const wordCount = fullText.split(/\s+/).length;
+    const fullText = transcription.text || "";
+    const wordCount = fullText ? fullText.split(/\s+/).length : 0;
     const duration = (transcription as any).duration || segments[segments.length - 1]?.end || 60;
 
     // =========================================================================
@@ -232,15 +247,34 @@ export async function POST(req: NextRequest) {
     ${fullText}
     </transcript>`;
 
-    const completion = await nvidia.chat.completions.create({
-      model: "meta/llama-3.1-70b-instruct", 
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.2,
-    });
+    let completion;
+    try {
+      completion = await nvidia.chat.completions.create({
+        model: "meta/llama-3.1-70b-instruct", 
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.2,
+      });
+    } catch (nvidiaErr: any) {
+      console.error("NVIDIA LLM Error:", nvidiaErr);
+      // Fallback response format if NVIDIA NIM fails or rate-limits
+      completion = {
+        choices: [{
+          message: {
+            content: JSON.stringify({
+              title: name !== "New Meeting" ? name : "Audio Note",
+              tldr: fullText ? `Transcript generated (${wordCount} words). AI summary currently unavailable.` : "No audio text transcribed.",
+              keyQuote: fullText ? fullText.substring(0, 120) + "..." : "",
+              actionItems: [],
+              insights: { sentiment: "neutral", meetingType: "General Discussion", risks: [], decisions: [] }
+            })
+          }
+        }]
+      };
+    }
 
 
     const LLMResultSchema = z.object({
