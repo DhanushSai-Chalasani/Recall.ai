@@ -304,20 +304,20 @@ export function Sidebar() {
         className="hidden lg:flex flex-col flex-shrink-0 h-screen border-r border-sidebar-border bg-sidebar text-sidebar-foreground overflow-hidden relative z-30 select-none"
       >
         {/* Header: Logo & Collapse */}
-        <div className={`flex items-center border-b border-sidebar-border h-13 px-3 ${collapsed ? "justify-center" : "justify-between"}`}>
+        <div className={`flex items-center border-b border-sidebar-border h-14 px-3.5 ${collapsed ? "justify-center" : "justify-between"}`}>
           <AnimatePresence mode="wait">
             {!collapsed ? (
               <motion.div
                 key="logo-full"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 transition={{ duration: 0.12 }}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2.5"
               >
-                <div className="w-6 h-6 rounded bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0 font-bold text-xs">
-                  <Mic className="w-3.5 h-3.5" />
+                <div className="w-7.5 h-7.5 rounded-lg bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0 font-bold shadow-xs">
+                  <Mic className="w-4.5 h-4.5" />
                 </div>
-                <span className="font-semibold text-foreground text-sm tracking-tight">
-                  Recall<span className="text-primary font-normal">.ai</span>
+                <span className="font-bold text-foreground text-lg tracking-tight">
+                  Recall<span className="text-primary font-semibold">.ai</span>
                 </span>
               </motion.div>
             ) : (
@@ -325,9 +325,9 @@ export function Sidebar() {
                 key="logo-icon"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 transition={{ duration: 0.12 }}
-                className="w-6 h-6 rounded bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs"
+                className="w-7.5 h-7.5 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold"
               >
-                <Mic className="w-3.5 h-3.5" />
+                <Mic className="w-4.5 h-4.5" />
               </motion.div>
             )}
           </AnimatePresence>
@@ -527,36 +527,36 @@ export function Sidebar() {
           )}
         </div>
 
-        {/* Footer: Settings */}
-        <div className={`border-t border-sidebar-border py-2 ${collapsed ? "px-0 flex flex-col items-center gap-1" : "px-2 space-y-0.5"}`}>
-          <FooterBtn icon={Settings} label="Settings" onClick={() => setSettingsOpen(true)} />
-
-          {/* User profile link */}
+        {/* Footer: User Profile & Settings */}
+        <div className={`border-t border-sidebar-border py-3 ${collapsed ? "px-0 flex flex-col items-center gap-2" : "px-2 space-y-2"}`}>
+          {/* User profile link — positioned ABOVE Settings with clean spacing */}
           {!collapsed ? (
             <Link
               href="/profile"
-              className="flex items-center gap-2.5 px-2.5 py-1.5 mt-1 rounded-md bg-sidebar-accent/40 hover:bg-sidebar-accent/80 border border-sidebar-border transition-colors group"
+              className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-sidebar-accent/50 hover:bg-sidebar-accent border border-sidebar-border transition-all group shadow-2xs"
               title="View & Edit Profile"
             >
-              <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center text-xs font-semibold text-primary flex-shrink-0 border border-border">
-                R
+              <div className="w-7.5 h-7.5 rounded-full bg-primary/15 flex items-center justify-center text-xs font-bold text-primary flex-shrink-0 border border-primary/20">
+                N
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-foreground truncate leading-tight group-hover:text-primary transition-colors">
-                  Rishikesh
+                <p className="text-xs font-semibold text-foreground truncate leading-tight group-hover:text-primary transition-colors">
+                  N Rishikesh
                 </p>
-                <p className="text-[10px] text-muted-foreground truncate">Free Plan</p>
+                <p className="text-[10px] text-muted-foreground font-medium truncate">Free Plan</p>
               </div>
             </Link>
           ) : (
             <Link
               href="/profile"
-              className="w-8 h-8 mx-auto mt-1 rounded-full bg-primary/15 flex items-center justify-center text-xs font-semibold text-primary border border-border hover:bg-primary/25 transition-colors"
+              className="w-8.5 h-8.5 rounded-full bg-primary/15 flex items-center justify-center text-xs font-bold text-primary border border-primary/20 hover:bg-primary/25 transition-colors"
               title="View Profile"
             >
-              R
+              N
             </Link>
           )}
+
+          <FooterBtn icon={Settings} label="Settings" onClick={() => setSettingsOpen(true)} />
         </div>
       </motion.nav>
 
@@ -569,13 +569,13 @@ export function Sidebar() {
             transition={{ type: "spring", stiffness: 350, damping: 35 }}
             className="fixed top-0 left-0 z-50 w-60 h-screen flex flex-col bg-sidebar border-r border-sidebar-border shadow-xl lg:hidden"
           >
-            <div className="flex items-center justify-between h-13 px-4 border-b border-sidebar-border">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs">
-                  <Mic className="w-3.5 h-3.5" />
+            <div className="flex items-center justify-between h-14 px-4 border-b border-sidebar-border">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7.5 h-7.5 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs">
+                  <Mic className="w-4.5 h-4.5" />
                 </div>
-                <span className="font-semibold text-foreground text-sm tracking-tight">
-                  Recall<span className="text-primary font-normal">.ai</span>
+                <span className="font-bold text-foreground text-lg tracking-tight">
+                  Recall<span className="text-primary font-semibold">.ai</span>
                 </span>
               </div>
               <button onClick={() => setMobileOpen(false)} className="p-1 rounded text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
