@@ -12,6 +12,7 @@ import { TranscriptView } from "@/components/results/TranscriptView"
 import { ActionItemList } from "@/components/results/ActionItemList"
 import { InsightsPanel } from "@/components/results/InsightsPanel"
 import { ExportDropdown } from "@/components/shared/ExportDropdown"
+import { AudioPlayer } from "@/components/shared/AudioPlayer"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { toast } from "sonner"
 
@@ -51,6 +52,32 @@ export default function MeetingDetailPage() {
       toast.error("An error occurred")
     } finally {
       setIsArchiving(false)
+    }
+  }
+
+  const handleActionItemsChange = async (updatedActionItems: any[]) => {
+    setMeeting((prev: any) => ({
+      ...prev,
+      actionItems: updatedActionItems,
+      stats: {
+        ...prev?.stats,
+        actionItemCount: updatedActionItems.length,
+      },
+    }))
+
+    try {
+      const res = await fetch(`/api/meetings/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ actionItems: updatedActionItems }),
+      })
+      if (res.ok) {
+        window.dispatchEvent(new CustomEvent("meetings-updated"))
+      } else {
+        toast.error("Failed to save action item changes.")
+      }
+    } catch (e) {
+      toast.error("An error occurred while saving action items.")
     }
   }
 
@@ -103,6 +130,7 @@ export default function MeetingDetailPage() {
   }
 
   const date = new Date(meeting.created_at)
+  const effectiveAudioUrl = meeting.audioUrl || (meeting.id?.startsWith("demo-") ? "https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg" : null)
 
   return (
     <motion.div
@@ -159,6 +187,13 @@ export default function MeetingDetailPage() {
           <ExportDropdown result={meeting} />
         </div>
       </div>
+
+      {/* Audio Player Deck */}
+      {effectiveAudioUrl && (
+        <div className="mb-4">
+          <AudioPlayer audioUrl={effectiveAudioUrl} />
+        </div>
+      )}
 
       {/* Stats */}
       <StatsRow stats={meeting.stats} />
@@ -217,7 +252,7 @@ export default function MeetingDetailPage() {
 
           <TabsContent value="actions">
             <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-              <ActionItemList items={meeting.actionItems} />
+              <ActionItemList items={meeting.actionItems} onChange={handleActionItemsChange} />
             </motion.div>
           </TabsContent>
 

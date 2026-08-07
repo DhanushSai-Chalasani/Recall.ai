@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import Groq from "groq-sdk";
 import OpenAI from "openai";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -409,11 +409,11 @@ export async function POST(req: NextRequest) {
     // the critical-path latency by deferring only the embedding phase.
     const response = NextResponse.json({ ...result, audioUrl });
 
-    // Fire-and-forget: embed transcript chunks for RAG search after response is sent
     const embeddingUserId = user.id;
     const embeddingMeetingId = meetingId;
     const hfToken = process.env.HF_TOKEN;
-    Promise.resolve().then(async () => {
+
+    after(async () => {
       try {
         if (!hfToken) return;
         const hf = new HfInference(hfToken);

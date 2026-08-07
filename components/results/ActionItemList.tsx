@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Plus, X, Calendar, Mail } from "lucide-react"
 import { toast } from "sonner"
@@ -13,9 +13,13 @@ interface ActionItemListProps {
 }
 
 export function ActionItemList({ items, onChange }: ActionItemListProps) {
-  const [localItems, setLocalItems] = useState(items)
+  const [localItems, setLocalItems] = useState(items || [])
   const [newText, setNewText] = useState("")
   const [showInput, setShowInput] = useState(false)
+
+  useEffect(() => {
+    setLocalItems(items || [])
+  }, [items])
 
   function toggleDone(id: string) {
     const updated = localItems.map(item =>

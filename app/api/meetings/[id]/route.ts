@@ -121,9 +121,15 @@ export async function PATCH(
   if (id.startsWith("demo-")) {
     const mock = MOCK_MEETINGS.find((m) => m.id === id) || MOCK_MEETING
     const body = await req.json().catch(() => ({}))
+    const updatedActionItems = body.actionItems !== undefined ? body.actionItems : (body.action_items !== undefined ? body.action_items : mock.actionItems)
     const updated = {
       ...mock,
       name: body.name !== undefined ? body.name : mock.name,
+      actionItems: updatedActionItems,
+      stats: {
+        ...(mock.stats || {}),
+        actionItemCount: updatedActionItems ? updatedActionItems.length : (mock.stats?.actionItemCount || 0)
+      },
       insights: {
         ...mock.insights,
         ...(body.insights || {}),
@@ -141,7 +147,7 @@ export async function PATCH(
   // Fetch the existing meeting first
   const { data: existing, error: fetchError } = await supabase
     .from("meetings")
-    .select("insights, name")
+    .select("insights, name, action_items")
     .eq("id", id)
     .eq("user_id", user.id)
     .single()
@@ -152,11 +158,16 @@ export async function PATCH(
 
   try {
     const body = await req.json()
-    const { name, insights } = body
+    const { name, insights, actionItems, action_items } = body
 
     const updateData: any = {}
     if (name !== undefined) {
       updateData.name = name
+    }
+    if (actionItems !== undefined) {
+      updateData.action_items = actionItems
+    } else if (action_items !== undefined) {
+      updateData.action_items = action_items
     }
     if (insights !== undefined) {
       updateData.insights = {

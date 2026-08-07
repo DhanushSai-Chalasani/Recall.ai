@@ -25,7 +25,10 @@ export function AudioPlayer({ audioUrl, onSeek }: AudioPlayerProps) {
     audioRef.current = audio
 
     audio.addEventListener("loadedmetadata", () => setDuration(audio.duration))
-    audio.addEventListener("timeupdate", () => setCurrentTime(audio.currentTime))
+    audio.addEventListener("timeupdate", () => {
+      setCurrentTime(audio.currentTime)
+      window.dispatchEvent(new CustomEvent("audio-time-update", { detail: audio.currentTime }))
+    })
     audio.addEventListener("ended", () => setIsPlaying(false))
 
     const handleSeekEvent = (e: Event) => {

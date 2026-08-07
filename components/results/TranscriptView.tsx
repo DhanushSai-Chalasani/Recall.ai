@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Search } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Search, Volume2 } from "lucide-react"
 import { formatTimestamp, getSpeakerColor } from "@/lib/utils"
 import type { TranscriptLine } from "@/lib/types"
 
@@ -53,11 +53,34 @@ function buildSpeakerIndex(lines: TranscriptLine[]): Map<string, number> {
 
 export function TranscriptView({ lines, onSeek }: TranscriptViewProps) {
   const [search, setSearch] = useState("")
+  const [activeTime, setActiveTime] = useState<number | null>(null)
   const speakerIndex = buildSpeakerIndex(lines)
+
+  useEffect(() => {
+    const handleTimeUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<number>
+      if (typeof customEvent.detail === "number") {
+        setActiveTime(customEvent.detail)
+      }
+    }
+    window.addEventListener("audio-time-update", handleTimeUpdate)
+    return () => window.removeEventListener("audio-time-update", handleTimeUpdate)
+  }, [])
 
   const filtered = search
     ? lines.filter(l => l.text.toLowerCase().includes(search.toLowerCase()))
     : lines
+
+  let activeIndex = -1
+  if (activeTime !== null) {
+    for (let idx = 0; idx < filtered.length; idx++) {
+      if (filtered[idx].timestamp <= activeTime) {
+        activeIndex = idx
+      } else {
+        break
+      }
+    }
+  }
 
   return (
     <div className="bg-card border border-border p-5 rounded-xl shadow-xs space-y-3">
@@ -77,6 +100,7 @@ export function TranscriptView({ lines, onSeek }: TranscriptViewProps) {
       <div className="max-h-[420px] overflow-y-auto space-y-1 pr-1">
         {filtered.map((line, i) => {
           const color = getSpeakerColor(speakerIndex.get(line.speaker) ?? 0)
+          const isActive = i === activeIndex
           return (
             <button
               key={i}
@@ -84,15 +108,26 @@ export function TranscriptView({ lines, onSeek }: TranscriptViewProps) {
                 onSeek?.(line.timestamp)
                 window.dispatchEvent(new CustomEvent('seek-audio', { detail: line.timestamp }))
               }}
-              className="w-full text-left flex items-start gap-3 p-2.5 rounded-md hover:bg-muted/60 transition-colors group cursor-pointer"
+              className={`w-full text-left flex items-start gap-3 p-2.5 rounded-md transition-all group cursor-pointer ${
+                isActive
+                  ? "bg-primary/10 border border-primary/30 shadow-xs"
+                  : "hover:bg-muted/60 border border-transparent"
+              }`}
             >
-              <span className="text-xs font-semibold min-w-[85px] truncate" style={{ color }}>
-                {line.speaker}
-              </span>
-              <span className="text-[10px] font-mono text-muted-foreground min-w-[40px] pt-0.5">
+              <div className="flex items-center gap-1.5 min-w-[85px]">
+                {isActive ? (
+                  <Volume2 className="w-3 h-3 text-primary animate-pulse flex-shrink-0" />
+                ) : (
+                  <span className="w-3 h-3 flex-shrink-0" />
+                )}
+                <span className="text-xs font-semibold truncate" style={{ color }}>
+                  {line.speaker}
+                </span>
+              </div>
+              <span className={`text-[10px] font-mono min-w-[40px] pt-0.5 ${isActive ? "text-primary font-bold" : "text-muted-foreground"}`}>
                 {formatTimestamp(line.timestamp)}
               </span>
-              <span className="text-xs text-foreground flex-1 leading-relaxed">
+              <span className={`text-xs flex-1 leading-relaxed ${isActive ? "text-foreground font-medium" : "text-foreground"}`}>
                 {highlightText(line.text)}
               </span>
             </button>
