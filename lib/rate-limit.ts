@@ -38,7 +38,6 @@ function cleanupStaleEntries(windowMs: number): void {
   lastCleanup = now;
 
   for (const [key, entry] of rateLimitStore.entries()) {
-    // Remove entries with no recent timestamps
     const validTimestamps = entry.timestamps.filter((t) => now - t < windowMs);
     if (validTimestamps.length === 0) {
       rateLimitStore.delete(key);

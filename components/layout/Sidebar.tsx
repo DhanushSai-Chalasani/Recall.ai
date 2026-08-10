@@ -20,6 +20,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion"
 import { SettingsModal } from "./SettingsModal"
 import { useTheme } from "@/contexts/theme-context"
+import { useSubscription } from "@/contexts/subscription-context"
 
 const NAV_ITEMS = [
   { label: "Record",   icon: Mic,     href: "/dashboard" },
@@ -41,6 +42,7 @@ export function Sidebar() {
   const [collapsed,    setCollapsed]    = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const { theme, setTheme } = useTheme()
+  const { isPro } = useSubscription()
 
   const [meetings, setMeetings] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -543,7 +545,9 @@ export function Sidebar() {
                 <p className="text-xs font-semibold text-foreground truncate leading-tight group-hover:text-primary transition-colors">
                   N Rishikesh
                 </p>
-                <p className="text-[10px] text-muted-foreground font-medium truncate">Free Plan</p>
+                <p className={`text-[10px] font-medium truncate ${isPro ? "text-primary font-bold" : "text-muted-foreground"}`}>
+                  {isPro ? "Pro Plan ✨" : "Free Plan"}
+                </p>
               </div>
             </Link>
           ) : (
