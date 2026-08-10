@@ -126,6 +126,8 @@ export async function PATCH(
       ...mock,
       name: body.name !== undefined ? body.name : mock.name,
       actionItems: updatedActionItems,
+      speakers: body.speakers !== undefined ? body.speakers : mock.speakers,
+      transcript: body.transcript !== undefined ? body.transcript : mock.transcript,
       stats: {
         ...(mock.stats || {}),
         actionItemCount: updatedActionItems ? updatedActionItems.length : (mock.stats?.actionItemCount || 0)
@@ -147,7 +149,7 @@ export async function PATCH(
   // Fetch the existing meeting first
   const { data: existing, error: fetchError } = await supabase
     .from("meetings")
-    .select("insights, name, action_items")
+    .select("insights, name, action_items, speakers, transcript")
     .eq("id", id)
     .eq("user_id", user.id)
     .single()
@@ -158,11 +160,17 @@ export async function PATCH(
 
   try {
     const body = await req.json()
-    const { name, insights, actionItems, action_items } = body
+    const { name, insights, actionItems, action_items, speakers, transcript } = body
 
     const updateData: any = {}
     if (name !== undefined) {
       updateData.name = name
+    }
+    if (speakers !== undefined) {
+      updateData.speakers = speakers
+    }
+    if (transcript !== undefined) {
+      updateData.transcript = transcript
     }
     if (actionItems !== undefined) {
       updateData.action_items = actionItems

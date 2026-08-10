@@ -159,6 +159,34 @@ ${result.transcript.map(l => `**${l.speaker}** *(${formatTimestamp(l.timestamp)}
     setOpen(false)
   }
 
+  function exportToSlack() {
+    const url = prompt("Enter your Slack Incoming Webhook URL:\n(e.g., https://hooks.slack.com/services/...)")
+    if (!url || !url.trim()) return
+
+    toast.promise(
+      fetch("/api/export/slack", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          meetingName: result.name,
+          tldr: result.tldr,
+          actionItems: result.actionItems,
+          webhookUrl: url.trim()
+        }),
+      }).then(async r => {
+        const data = await r.json()
+        if (!r.ok) throw new Error(data.error || "Failed")
+        return data
+      }),
+      {
+        loading: "Posting to Slack channel...",
+        success: "Meeting notes & action items posted to Slack!",
+        error: (err: any) => `Slack export failed: ${err.message || "Unknown error"}`,
+      }
+    )
+    setOpen(false)
+  }
+
   const ITEMS = [
     { icon: Copy, label: "Copy Summary", action: copySummary },
     { icon: FileText, label: "Copy Transcript", action: copyTranscript },
@@ -169,6 +197,7 @@ ${result.transcript.map(l => `**${l.speaker}** *(${formatTimestamp(l.timestamp)}
     { divider: true },
     { icon: BookHeart, label: "Send to Notion", action: exportToNotion },
     { icon: FileText, label: "Send to Google Docs", action: exportToGoogleDocs },
+    { icon: ClipboardList, label: "Send to Slack Channel", action: exportToSlack },
   ] as const
 
   return (

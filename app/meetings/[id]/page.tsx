@@ -81,6 +81,43 @@ export default function MeetingDetailPage() {
     }
   }
 
+  const handleRenameSpeaker = async (speakerId: string, oldLabel: string, newLabel: string) => {
+    if (!newLabel.trim() || oldLabel === newLabel) return
+
+    const updatedSpeakers = (meeting.speakers || []).map((s: any) =>
+      s.id === speakerId ? { ...s, label: newLabel.trim() } : s
+    )
+
+    const updatedTranscript = (meeting.transcript || []).map((line: any) =>
+      line.speaker === oldLabel ? { ...line, speaker: newLabel.trim() } : line
+    )
+
+    setMeeting((prev: any) => ({
+      ...prev,
+      speakers: updatedSpeakers,
+      transcript: updatedTranscript,
+    }))
+
+    try {
+      const res = await fetch(`/api/meetings/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          speakers: updatedSpeakers,
+          transcript: updatedTranscript,
+        }),
+      })
+      if (res.ok) {
+        toast.success(`Speaker updated to "${newLabel.trim()}"`)
+        window.dispatchEvent(new CustomEvent("meetings-updated"))
+      } else {
+        toast.error("Failed to save speaker name.")
+      }
+    } catch (e) {
+      toast.error("An error occurred while renaming speaker.")
+    }
+  }
+
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to permanently delete this meeting?")) return
     try {
@@ -199,7 +236,7 @@ export default function MeetingDetailPage() {
       <StatsRow stats={meeting.stats} />
 
       {/* Speaker Chips */}
-      <SpeakerChips speakers={meeting.speakers} />
+      <SpeakerChips speakers={meeting.speakers} onRenameSpeaker={handleRenameSpeaker} />
 
       {/* Tabs */}
       <Tabs defaultValue="tldr" className="w-full mt-4">
